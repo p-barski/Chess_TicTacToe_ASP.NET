@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8" />
+</head>
+
+<body>
+	<p id="stateLabel">Disconnected</p>
+	<div>
+		<button id="connectButton">Connect</button>
+		<button id="closeButton" disabled>Close Socket</button>
+	</div>
+	<div>
+		<button id="findGameButton" disabled>Find game</button>
+		<input id="sizeInput" placeholder="Size"></input>
+	</div>
+	<div id="buttonsDiv"></div>
+	<div id="msgs"></div>
+	<p></p>
+</body>
+
+<script>
+	const connectButton = document.getElementById("connectButton");
+	const findGameButton = document.getElementById("findGameButton");
+	const closeButton = document.getElementById("closeButton");
+	const stateLabel = document.getElementById("stateLabel");
+	const sizeInput = document.getElementById("sizeInput");
+	const buttonsDiv = document.getElementById("buttonsDiv");
+	const msgDiv = document.getElementById("msgs");
+	const buttons = [];
+	let socket;
+
+	connectButton.onclick = function () {
+		stateLabel.innerHTML = "Attempting to connect...";
+		socket = new WebSocket("ws://localhost:5000");
+		socket.onopen = function (event) {
+			updateState();
+			msgDiv.innerHTML += "<p>Connected to server</p>";
+		};
+		socket.onclose = function (event) {
+			updateState();
+			msgDiv.innerHTML += "<p>Connection closed. Code: "
+				+ `${htmlEscape(event.code)} | Reason: `
+				+ `${htmlEscape(event.reason)}</p>`;
+		};
+		socket.onerror = updateState;
+		socket.onmessage = function (event) {
+			handleMessage(event.data)
+		};
+	};
+
+	closeButton.onclick = function () {
+		if (!socket || socket.readyState !== WebSocket.OPEN) {
+			alert("Socket not connected.");
+			closeButton.disable = true;
+		}
+		socket.close(1000, "Closing from client");
+	};
+
+	findGameButton.onclick = function () {
+		if (!socket || socket.readyState !== WebSocket.OPEN) {
+			alert("Socket not connected.");
+			findGameButton.disabled = true;
+			return;
+		}
+		const size = parseInt(sizeInput.value);
+		createButtons(size);
+		var data = FindGameMessage(size);
+		socket.send(data);
+		msgDiv.innerHTML += `<p>Sent msg: ${htmlEscape(data)}</p>`;
+	};
+
+	function htmlEscape(str) {
+		return str.toString()
+			.replace(/&/g, '&amp;')
+			.replace(/"/g, '&quot;')
+			.replace(/'/g, '&#39;')
+			.replace(/</g, '&lt;')
+			.replace(/>/g, '&gt;');
+	}
+
+	function updateState() {
+		function disable() {
+			closeButton.disabled = true;
+			findGameButton.disabled = true;
+		}
+		function enable() {
+			closeButton.disabled = false;
+			findGameButton.disabled = false;
+		}
+		connectButton.disabled = true;
+		if (!socket) {
+			disable();
+		} else {
+			switch (socket.readyState) {
+				case WebSocket.CLOSED:
+					stateLabel.innerHTML = "Closed";
+					disable();
+					connectButton.disabled = false;
+					break;
+				case WebSocket.CLOSING:
+					stateLabel.innerHTML = "Closing...";
+					disable();
+					break;
+				case WebSocket.CONNECTING:
+					stateLabel.innerHTML = "Connecting...";
+					disable();
+					break;
+				case WebSocket.OPEN:
+					stateLabel.innerHTML = "Open";
+					enable();
+					break;
+				default:
+					stateLabel.innerHTML = "Unknown WebSocket State: " + htmlEscape(socket.readyState);
+					disable();
+					break;
+			}
+		}
+	}
+	function createButtons(size) {
+		for (row of buttons) {
+			for (button of row) {
+				button.parentNode.removeChild(button);
+			}
+		}
+		buttons.length = 0;
+		buttonsDiv.innerHTML = " ";
+		for (let y = 0; y < size; y++) {
+			const row = [];
+			const rowDiv = document.createElement("div");
+			for (let x = 0; x < size; x++) {
+				const button = document.createElement("button");
+				button.id = `X${x}_Y${y}`;
+				button.onclick = function () { buttonClick(x, y) };
+				button.innerHTML = ".";
+				row.push(button);
+				rowDiv.appendChild(button);
+			}
+			buttons.push(row);
+			buttonsDiv.appendChild(rowDiv);
+		}
+	}
+
+	function buttonClick(x, y) {
+		if (!socket || socket.readyState !== WebSocket.OPEN) {
+			alert("Socket not connected.");
+			createButtons(0);
+			return;
+		}
+		socket.send(MakeMoveMessage(x, y));
+	}
+
+	function FindGameMessage(size) {
+		return JSON.stringify({
+			"Size": size
+		});
+	}
+	function MakeMoveMessage(x, y) {
+		return JSON.stringify({
+			"X": x,
+			"Y": y
+		})
+	}
+
+	let mySign, opponentSign;
+	let myTurn;
+	function handleMessage(data) {
+		msgDiv.innerHTML += `<p>Incoming msg: ${htmlEscape(data)}</p>`;
+		const json = JSON.parse(data);
+		if (json.IsClientTurn === false) {
+			mySign = "O";
+			opponentSign = "X";
+			myTurn = false;
+		}
+		else if (json.IsClientTurn === true) {
+			mySign = "X";
+			opponentSign = "O";
+			myTurn = true;
+		}
+		else if (json.Message === "Success" || json.Message === "YouLose" || json.Message === "YouWin") {
+			if (myTurn)
+				buttons[json.Y][json.X].innerHTML = mySign;
+			else
+				buttons[json.Y][json.X].innerHTML = opponentSign;
+			myTurn = !myTurn;
+		}
+		else if (json.Reason === "Other player closed the game.") {
+			createButtons(0);
+		}
+	}
+</script>
+
+</html>

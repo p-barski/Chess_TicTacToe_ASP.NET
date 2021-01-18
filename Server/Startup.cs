@@ -1,3 +1,5 @@
+using System.IO;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
@@ -28,6 +30,14 @@ namespace Server
 			}
 			app.UseWebSockets();
 			app.UseMiddleware<WebSocketMiddleware>();
+			app.UseRouting();
+			var html = File.ReadAllText("./simpleUI.html");
+			app.UseEndpoints(endpoints =>
+			{
+				endpoints.MapGet("/", async context =>
+					await context.Response.WriteAsync(html)
+				);
+			});
 		}
 	}
 }
