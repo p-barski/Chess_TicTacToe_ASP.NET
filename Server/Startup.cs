@@ -19,7 +19,7 @@ namespace Server
 			services.AddSingleton<IMessageSender, MessageSender>();
 			services.AddSingleton<IMessageHandler, FindGameHandler>();
 			services.AddSingleton<IMessageHandler, MakeMoveHandler>();
-			services.AddSingleton<MainHandler>();
+			services.AddSingleton<ISocketMessageHandler, SocketMessageHandler>();
 			services.AddSingleton<SocketController>();
 		}
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

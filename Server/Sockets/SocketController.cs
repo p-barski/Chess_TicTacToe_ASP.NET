@@ -11,9 +11,9 @@ namespace Server.Sockets
 	{
 		private readonly ICollections collections;
 		private readonly ILogger<SocketController> logger;
-		private readonly MainHandler handler;
+		private readonly ISocketMessageHandler handler;
 		public SocketController(ILogger<SocketController> logger,
-			ICollections collections, MainHandler handler)
+			ICollections collections, ISocketMessageHandler handler)
 		{
 			this.collections = collections;
 			this.logger = logger;

@@ -9,13 +9,13 @@ using Server.Sockets.Other;
 
 namespace Server.Sockets.Handlers
 {
-	public class MainHandler
+	public class SocketMessageHandler : ISocketMessageHandler
 	{
 		private readonly ICollections collections;
-		private readonly ILogger<MainHandler> logger;
+		private readonly ILogger<SocketMessageHandler> logger;
 		private readonly IMessageDeserializer deserializer;
 		private readonly IEnumerable<IMessageHandler> handlers;
-		public MainHandler(ICollections collections, ILogger<MainHandler> logger,
+		public SocketMessageHandler(ICollections collections, ILogger<SocketMessageHandler> logger,
 			IMessageDeserializer deserializer, IEnumerable<IMessageHandler> handlers)
 		{
 			this.collections = collections;
