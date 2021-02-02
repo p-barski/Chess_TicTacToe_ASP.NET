@@ -4,7 +4,7 @@ using Server.Sockets.Messages;
 
 namespace Server.Sockets.Other
 {
-	public class MessageDeserializer
+	public class MessageDeserializer : IMessageDeserializer
 	{
 		private readonly JsonSerializerSettings jsonSettings =
 			new JsonSerializerSettings()

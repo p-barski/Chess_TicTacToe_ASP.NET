@@ -11,15 +11,13 @@ namespace Server.Sockets.Handlers
 	{
 		private readonly Collections collections;
 		private readonly ILogger<FindGameHandler> logger;
-		private readonly MessageDeserializer deserializer;
 		private readonly IMessageSender messageSender;
 
 		public FindGameHandler(Collections collections, ILogger<FindGameHandler> logger,
-			MessageDeserializer deserializer, IMessageSender messageSender)
+			IMessageDeserializer deserializer, IMessageSender messageSender)
 		{
 			this.collections = collections;
 			this.logger = logger;
-			this.deserializer = deserializer;
 			this.messageSender = messageSender;
 		}
 		public async Task HandleMessageAsync(Player player, IMessage message)

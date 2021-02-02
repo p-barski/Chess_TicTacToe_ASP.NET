@@ -10,10 +10,10 @@ namespace Server.Sockets.Other
 	public class MessageSender : IMessageSender
 	{
 		private readonly ILogger<MessageSender> logger;
-		private readonly MessageDeserializer deserializer;
+		private readonly IMessageDeserializer deserializer;
 
 		public MessageSender(ILogger<MessageSender> logger,
-			MessageDeserializer deserializer)
+			IMessageDeserializer deserializer)
 		{
 			this.logger = logger;
 			this.deserializer = deserializer;

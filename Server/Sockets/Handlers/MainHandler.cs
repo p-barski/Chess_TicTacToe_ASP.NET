@@ -13,10 +13,10 @@ namespace Server.Sockets.Handlers
 	{
 		private readonly Collections collections;
 		private readonly ILogger<MainHandler> logger;
-		private readonly MessageDeserializer deserializer;
+		private readonly IMessageDeserializer deserializer;
 		private readonly IEnumerable<IMessageHandler> handlers;
 		public MainHandler(Collections collections, ILogger<MainHandler> logger,
-			MessageDeserializer deserializer, IEnumerable<IMessageHandler> handlers)
+			IMessageDeserializer deserializer, IEnumerable<IMessageHandler> handlers)
 		{
 			this.collections = collections;
 			this.logger = logger;
