@@ -6,6 +6,6 @@ namespace Server.Sockets.Handlers
 {
 	public interface IMessageHandler
 	{
-		Task HandleMessageAsync(Player player, IReceivedMessage message);
+		Task HandleMessageAsync(IPlayer player, IReceivedMessage message);
 	}
 }

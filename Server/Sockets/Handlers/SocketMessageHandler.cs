@@ -23,7 +23,7 @@ namespace Server.Sockets.Handlers
 			this.deserializer = deserializer;
 			this.handlers = handlers;
 		}
-		public async Task HandleMessageAsync(Player player,
+		public async Task HandleMessageAsync(IPlayer player,
 			WebSocketReceiveResult result, byte[] buffer)
 		{
 			if (result.MessageType == WebSocketMessageType.Close)

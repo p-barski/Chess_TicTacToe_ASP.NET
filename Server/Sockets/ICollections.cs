@@ -5,11 +5,11 @@ namespace Server.Sockets
 {
 	public interface ICollections
 	{
-		void AddPlayer(Player player);
-		Task RemovePlayer(Player player);
-		void AddSession(Player first, Player second, int size);
-		void RemoveSession(GameSession session);
-		Player FindPlayerSearchingForGame(Player excludedPlayer);
-		GameSession FindSessionOfAPlayer(Player player);
+		void AddPlayer(IPlayer player);
+		Task RemovePlayer(IPlayer player);
+		void AddSession(IPlayer first, IPlayer second, int size);
+		void RemoveSession(IGameSession session);
+		IPlayer FindPlayerSearchingForGame(IPlayer excludedPlayer);
+		IGameSession FindSessionOfAPlayer(IPlayer player);
 	}
 }

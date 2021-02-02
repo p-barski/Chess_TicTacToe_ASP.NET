@@ -20,12 +20,12 @@ namespace Server.Sockets.Handlers
 			this.logger = logger;
 			this.messageSender = messageSender;
 		}
-		public async Task HandleMessageAsync(Player player, IReceivedMessage msg)
+		public async Task HandleMessageAsync(IPlayer player, IReceivedMessage msg)
 		{
 			var castedMsg = (MakeMoveMessage)msg;
 			logger.LogInformation($"MakeMoveMessage: X:{castedMsg.X}, Y:{castedMsg.Y}");
 
-			GameSession session;
+			IGameSession session;
 			try
 			{
 				session = collections.FindSessionOfAPlayer(player);
@@ -51,24 +51,24 @@ namespace Server.Sockets.Handlers
 					break;
 			}
 		}
-		private async Task SendToBothAsync(GameSession session, PlayResult result, int x, int y)
+		private async Task SendToBothAsync(IGameSession session, PlayResult result, int x, int y)
 		{
 			var msgToSend = new MoveResultMessage(result.ToString(), x, y);
-			await messageSender.SendMessageAsync(session.PlayerX.Socket, msgToSend);
-			await messageSender.SendMessageAsync(session.PlayerO.Socket, msgToSend);
+			await messageSender.SendMessageAsync(session.PlayerOne.Socket, msgToSend);
+			await messageSender.SendMessageAsync(session.PlayerTwo.Socket, msgToSend);
 		}
-		private async Task SendToSenderAsync(Player player, PlayResult result)
+		private async Task SendToSenderAsync(IPlayer player, PlayResult result)
 		{
 			var msgToSend = new MoveResultMessage(result.ToString(), 0, 0);
 			await messageSender.SendMessageAsync(player.Socket, msgToSend);
 		}
-		private async Task SendGameFinishedAsync(GameSession session, Player winner, int x, int y)
+		private async Task SendGameFinishedAsync(IGameSession session, IPlayer winner, int x, int y)
 		{
-			Player loser;
-			if (session.PlayerO == winner)
-				loser = session.PlayerX;
+			IPlayer loser;
+			if (session.PlayerTwo == winner)
+				loser = session.PlayerOne;
 			else
-				loser = session.PlayerO;
+				loser = session.PlayerTwo;
 
 			var msgToWinner = new MoveResultMessage(PlayResult.YouWin.ToString(), x, y);
 			var msgToLoser = new MoveResultMessage(PlayResult.YouLose.ToString(), x, y);

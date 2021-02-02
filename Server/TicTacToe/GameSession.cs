@@ -3,30 +3,30 @@ using TicTacToe;
 
 namespace Server.TicTacToe
 {
-	public class GameSession
+	public class GameSession : IGameSession
 	{
 		public Guid GUID { get; } = Guid.NewGuid();
-		public Player PlayerX { get; }
-		public Player PlayerO { get; }
+		public IPlayer PlayerOne { get; }
+		public IPlayer PlayerTwo { get; }
 		private Game game;
-		public GameSession(Player first, Player second, int size)
+		public GameSession(IPlayer playerOne, IPlayer playerTwo, int size)
 		{
-			lock (first)
+			lock (playerOne)
 			{
-				lock (second)
+				lock (playerTwo)
 				{
-					if (first.GameSessionGUID != Guid.Empty || second.GameSessionGUID != Guid.Empty)
+					if (playerOne.GameSessionGUID != Guid.Empty || playerTwo.GameSessionGUID != Guid.Empty)
 						throw new InvalidOperationException("Player is already assigned to a game session.");
 
-					PlayerX = first;
-					PlayerO = second;
-					PlayerX.AddToGame(GUID, XO_Enum.X);
-					PlayerO.AddToGame(GUID, XO_Enum.O);
+					PlayerOne = playerOne;
+					PlayerTwo = playerTwo;
+					PlayerOne.AddToGame(GUID, XO_Enum.X);
+					PlayerTwo.AddToGame(GUID, XO_Enum.O);
 					game = new Game(size);
 				}
 			}
 		}
-		public PlayResult Play(Player from, int x, int y)
+		public PlayResult Play(IPlayer from, int x, int y)
 		{
 			if (from.Sign != game.CurrentPlayer)
 				return PlayResult.NotYourTurn;
@@ -55,8 +55,8 @@ namespace Server.TicTacToe
 		}
 		public void Close()
 		{
-			PlayerX.RemoveFromGame();
-			PlayerO.RemoveFromGame();
+			PlayerOne.RemoveFromGame();
+			PlayerTwo.RemoveFromGame();
 		}
 	}
 }

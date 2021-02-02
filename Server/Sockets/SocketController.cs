@@ -21,7 +21,7 @@ namespace Server.Sockets
 		}
 		public async Task ReceiveAsync(WebSocket socket)
 		{
-			Player player = new Player(socket);
+			IPlayer player = new Player(socket);
 			collections.AddPlayer(player);
 			var buffer = new byte[1024 * 4];
 			try

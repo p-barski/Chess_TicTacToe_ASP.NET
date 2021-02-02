@@ -4,7 +4,7 @@ using TicTacToe;
 
 namespace Server.TicTacToe
 {
-	public class Player
+	public class Player : IPlayer
 	{
 		public Guid GUID { get; } = Guid.NewGuid();
 		public WebSocket Socket { get; }

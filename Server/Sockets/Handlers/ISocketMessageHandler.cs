@@ -6,6 +6,6 @@ namespace Server.Sockets.Handlers
 {
 	public interface ISocketMessageHandler
 	{
-		Task HandleMessageAsync(Player player, WebSocketReceiveResult result, byte[] buffer);
+		Task HandleMessageAsync(IPlayer player, WebSocketReceiveResult result, byte[] buffer);
 	}
 }
