@@ -20,7 +20,7 @@ namespace Server.Sockets.Handlers
 			this.logger = logger;
 			this.messageSender = messageSender;
 		}
-		public async Task HandleMessageAsync(Player player, IMessage msg)
+		public async Task HandleMessageAsync(Player player, IReceivedMessage msg)
 		{
 			var castedMsg = (MakeMoveMessage)msg;
 			logger.LogInformation($"MakeMoveMessage: X:{castedMsg.X}, Y:{castedMsg.Y}");

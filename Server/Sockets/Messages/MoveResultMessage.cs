@@ -1,6 +1,6 @@
 namespace Server.Sockets.Messages
 {
-	public class MoveResultMessage : IMessage
+	public class MoveResultMessage : ISendMessage
 	{
 		public int X { get; set; }
 		public int Y { get; set; }

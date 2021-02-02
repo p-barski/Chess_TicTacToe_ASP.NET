@@ -1,6 +1,6 @@
 namespace Server.Sockets.Messages
 {
-	public interface IMessage
+	public interface ISendMessage
 	{
 	}
 }

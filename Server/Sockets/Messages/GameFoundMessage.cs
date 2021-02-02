@@ -1,6 +1,6 @@
 namespace Server.Sockets.Messages
 {
-	public class GameFoundMessage : IMessage
+	public class GameFoundMessage : ISendMessage
 	{
 		public bool IsClientTurn { get; set; }
 		public GameFoundMessage() { }

@@ -10,7 +10,7 @@ namespace Server.Sockets.Other
 			new JsonSerializerSettings()
 			{ MissingMemberHandling = MissingMemberHandling.Error };
 
-		public IMessage Deserialize(byte[] buffer, int byteCount)
+		public IReceivedMessage Deserialize(byte[] buffer, int byteCount)
 		{
 			var json = Encoding.UTF8.GetString(buffer, 0, byteCount);
 			try

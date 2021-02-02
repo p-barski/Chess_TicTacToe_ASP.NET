@@ -20,7 +20,7 @@ namespace Server.Sockets.Handlers
 			this.logger = logger;
 			this.messageSender = messageSender;
 		}
-		public async Task HandleMessageAsync(Player player, IMessage message)
+		public async Task HandleMessageAsync(Player player, IReceivedMessage message)
 		{
 			var castedMessage = (FindGameMessage)message;
 			logger.LogInformation(castedMessage.Size.ToString());

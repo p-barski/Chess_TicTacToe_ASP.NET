@@ -1,6 +1,6 @@
 namespace Server.Sockets.Messages
 {
-	public class SessionClosedMessage : IMessage
+	public class SessionClosedMessage : ISendMessage
 	{
 		public string Reason { get; set; }
 		public SessionClosedMessage() { }
