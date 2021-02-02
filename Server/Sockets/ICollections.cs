@@ -7,7 +7,7 @@ namespace Server.Sockets
 	{
 		void AddPlayer(IPlayer player);
 		Task RemovePlayer(IPlayer player);
-		void AddSession(IPlayer first, IPlayer second, int size);
+		void AddSession(IGameSession session);
 		void RemoveSession(IGameSession session);
 		IPlayer FindPlayerSearchingForGame(IPlayer excludedPlayer);
 		IGameSession FindSessionOfAPlayer(IPlayer player);

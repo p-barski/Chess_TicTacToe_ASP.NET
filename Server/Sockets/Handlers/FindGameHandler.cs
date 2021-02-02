@@ -28,7 +28,8 @@ namespace Server.Sockets.Handlers
 			try
 			{
 				var opponent = collections.FindPlayerSearchingForGame(player);
-				collections.AddSession(player, opponent, castedMessage.Size);
+				var session = new GameSession(player, opponent, castedMessage.Size);
+				collections.AddSession(session);
 				await messageSender.SendMessageAsync(player.Socket, new GameFoundMessage(true));
 				await messageSender.SendMessageAsync(opponent.Socket, new GameFoundMessage(false));
 			}

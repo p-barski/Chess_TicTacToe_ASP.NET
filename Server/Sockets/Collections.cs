@@ -41,15 +41,10 @@ namespace Server.Sockets
 				await messageSender.SendMessageAsync(session.PlayerTwo.Socket, message);
 			RemoveSession(session);
 		}
-		public void AddSession(IPlayer first, IPlayer second, int size)
+		public void AddSession(IGameSession session)
 		{
-			try
-			{
-				var session = new GameSession(first, second, size);
-				sessions.TryAdd(session, 0);
-				logger.LogInformation($"Session added: {session.GUID}");
-			}
-			catch (InvalidOperationException) { }
+			sessions.TryAdd(session, 0);
+			logger.LogInformation($"Session added: {session.GUID}");
 		}
 		public void RemoveSession(IGameSession session)
 		{
