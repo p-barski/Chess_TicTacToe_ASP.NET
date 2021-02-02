@@ -14,7 +14,7 @@ namespace Server
 	{
 		public void ConfigureServices(IServiceCollection services)
 		{
-			services.AddSingleton<Collections>();
+			services.AddSingleton<ICollections, Collections>();
 			services.AddSingleton<IMessageDeserializer, MessageDeserializer>();
 			services.AddSingleton<IMessageSender, MessageSender>();
 			services.AddSingleton<IMessageHandler, FindGameHandler>();

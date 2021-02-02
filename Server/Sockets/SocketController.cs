@@ -9,11 +9,11 @@ namespace Server.Sockets
 {
 	public class SocketController
 	{
-		private readonly Collections collections;
+		private readonly ICollections collections;
 		private readonly ILogger<SocketController> logger;
 		private readonly MainHandler handler;
 		public SocketController(ILogger<SocketController> logger,
-			Collections collections, MainHandler handler)
+			ICollections collections, MainHandler handler)
 		{
 			this.collections = collections;
 			this.logger = logger;

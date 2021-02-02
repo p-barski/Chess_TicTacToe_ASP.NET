@@ -9,7 +9,7 @@ using Server.Sockets.Messages;
 
 namespace Server.Sockets
 {
-	public class Collections
+	public class Collections : ICollections
 	{
 		private readonly ILogger<Collections> logger;
 		private readonly IMessageSender messageSender;

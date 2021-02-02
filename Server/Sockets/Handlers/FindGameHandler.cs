@@ -9,11 +9,11 @@ namespace Server.Sockets.Handlers
 {
 	public class FindGameHandler : IMessageHandler
 	{
-		private readonly Collections collections;
+		private readonly ICollections collections;
 		private readonly ILogger<FindGameHandler> logger;
 		private readonly IMessageSender messageSender;
 
-		public FindGameHandler(Collections collections, ILogger<FindGameHandler> logger,
+		public FindGameHandler(ICollections collections, ILogger<FindGameHandler> logger,
 			IMessageDeserializer deserializer, IMessageSender messageSender)
 		{
 			this.collections = collections;

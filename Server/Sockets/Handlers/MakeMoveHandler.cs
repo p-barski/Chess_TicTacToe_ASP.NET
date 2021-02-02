@@ -9,11 +9,11 @@ namespace Server.Sockets.Handlers
 {
 	public class MakeMoveHandler : IMessageHandler
 	{
-		private readonly Collections collections;
+		private readonly ICollections collections;
 		private readonly ILogger<MakeMoveHandler> logger;
 		private readonly IMessageSender messageSender;
 
-		public MakeMoveHandler(Collections collections, ILogger<MakeMoveHandler> logger,
+		public MakeMoveHandler(ICollections collections, ILogger<MakeMoveHandler> logger,
 			IMessageSender messageSender)
 		{
 			this.collections = collections;

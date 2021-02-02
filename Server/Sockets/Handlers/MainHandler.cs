@@ -11,11 +11,11 @@ namespace Server.Sockets.Handlers
 {
 	public class MainHandler
 	{
-		private readonly Collections collections;
+		private readonly ICollections collections;
 		private readonly ILogger<MainHandler> logger;
 		private readonly IMessageDeserializer deserializer;
 		private readonly IEnumerable<IMessageHandler> handlers;
-		public MainHandler(Collections collections, ILogger<MainHandler> logger,
+		public MainHandler(ICollections collections, ILogger<MainHandler> logger,
 			IMessageDeserializer deserializer, IEnumerable<IMessageHandler> handlers)
 		{
 			this.collections = collections;
