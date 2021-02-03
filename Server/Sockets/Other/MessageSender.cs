@@ -18,7 +18,7 @@ namespace Server.Sockets.Other
 			this.logger = logger;
 			this.deserializer = deserializer;
 		}
-		public async Task SendMessageAsync(WebSocket socket, ISendMessage message)
+		public async Task SendMessageAsync(IWebSocket socket, ISendMessage message)
 		{
 			var buffer = deserializer.SerializeToBuffer(message);
 			logger.LogInformation($"Sending msg: {message.GetType()};"

@@ -26,7 +26,7 @@ namespace Server.Sockets
 			}
 			WebSocket socket = await context.WebSockets.AcceptWebSocketAsync();
 			logger.LogInformation("Websocket connected");
-			await controller.ReceiveAsync(socket);
+			await controller.ReceiveAsync(new WebSocketWrapper(socket));
 		}
 	}
 }

@@ -1,5 +1,5 @@
 using System;
-using System.Net.WebSockets;
+using Server.Sockets;
 using TicTacToe;
 
 namespace Server.TicTacToe
@@ -7,7 +7,7 @@ namespace Server.TicTacToe
 	public interface IPlayer
 	{
 		Guid GUID { get; }
-		WebSocket Socket { get; }
+		IWebSocket Socket { get; }
 		XO_Enum Sign { get; }
 		int ExpectedBoardSize { get; }
 		PlayerState State { get; }

@@ -1,5 +1,5 @@
 using System;
-using System.Net.WebSockets;
+using Server.Sockets;
 using TicTacToe;
 
 namespace Server.TicTacToe
@@ -7,12 +7,12 @@ namespace Server.TicTacToe
 	public class Player : IPlayer
 	{
 		public Guid GUID { get; } = Guid.NewGuid();
-		public WebSocket Socket { get; }
+		public IWebSocket Socket { get; }
 		public XO_Enum Sign { get; private set; }
 		public int ExpectedBoardSize { get; private set; }
 		public PlayerState State { get; private set; } = PlayerState.Idle;
 		public Guid GameSessionGUID { get; private set; } = Guid.Empty;
-		public Player(WebSocket socket)
+		public Player(IWebSocket socket)
 		{
 			Socket = socket;
 		}

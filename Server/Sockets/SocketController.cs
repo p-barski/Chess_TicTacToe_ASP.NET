@@ -19,7 +19,7 @@ namespace Server.Sockets
 			this.logger = logger;
 			this.handler = handler;
 		}
-		public async Task ReceiveAsync(WebSocket socket)
+		public async Task ReceiveAsync(IWebSocket socket)
 		{
 			IPlayer player = new Player(socket);
 			collections.AddPlayer(player);
