@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Server.Sockets;
 using Server.Sockets.Other;
 using Server.Sockets.Handlers;
+using Server.TicTacToe;
 
 namespace Server
 {
@@ -14,6 +15,7 @@ namespace Server
 	{
 		public void ConfigureServices(IServiceCollection services)
 		{
+			services.AddSingleton<IGameSessionFactory, GameSessionFactory>();
 			services.AddSingleton<ICollections, Collections>();
 			services.AddSingleton<IMessageDeserializer, MessageDeserializer>();
 			services.AddSingleton<IMessageSender, MessageSender>();

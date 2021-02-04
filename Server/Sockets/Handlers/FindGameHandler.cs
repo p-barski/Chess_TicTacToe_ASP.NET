@@ -9,15 +9,17 @@ namespace Server.Sockets.Handlers
 {
 	public class FindGameHandler : IMessageHandler
 	{
-		private readonly ICollections collections;
 		private readonly ILogger<FindGameHandler> logger;
+		private readonly ICollections collections;
+		private readonly IGameSessionFactory sessionFactory;
 		private readonly IMessageSender messageSender;
 
-		public FindGameHandler(ICollections collections, ILogger<FindGameHandler> logger,
-			IMessageDeserializer deserializer, IMessageSender messageSender)
+		public FindGameHandler(ILogger<FindGameHandler> logger, ICollections collections,
+			IGameSessionFactory sessionFactory, IMessageSender messageSender)
 		{
-			this.collections = collections;
 			this.logger = logger;
+			this.collections = collections;
+			this.sessionFactory = sessionFactory;
 			this.messageSender = messageSender;
 		}
 		public async Task HandleMessageAsync(IPlayer player, IReceivedMessage message)
@@ -28,7 +30,7 @@ namespace Server.Sockets.Handlers
 			try
 			{
 				var opponent = collections.FindPlayerSearchingForGame(player);
-				var session = new GameSession(player, opponent, castedMessage.Size);
+				var session = sessionFactory.Create(player, opponent, castedMessage.Size);
 				collections.AddSession(session);
 				await messageSender.SendMessageAsync(player.Socket, new GameFoundMessage(true));
 				await messageSender.SendMessageAsync(opponent.Socket, new GameFoundMessage(false));
