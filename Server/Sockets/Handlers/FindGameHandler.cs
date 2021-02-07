@@ -25,13 +25,23 @@ namespace Server.Sockets.Handlers
 		public async Task HandleMessageAsync(IPlayer player, IReceivedMessage message)
 		{
 			var castedMessage = (FindGameMessage)message;
-			logger.LogInformation(castedMessage.Size.ToString());
+
+			if (player.GameSessionGUID != Guid.Empty)
+			{
+				var msgText = "This player is already connected to a game session.";
+				logger.LogInformation(msgText);
+				await messageSender.SendMessageAsync(player.Socket,
+					new InvalidStateMessage(msgText));
+				return;
+			}
+
 			player.SetAsSearchingForGame(castedMessage.Size);
 			try
 			{
 				var opponent = collections.FindPlayerSearchingForGame(player);
 				var session = sessionFactory.Create(player, opponent, castedMessage.Size);
 				collections.AddSession(session);
+				logger.LogInformation("Created new game session.");
 				await messageSender.SendMessageAsync(player.Socket, new GameFoundMessage(true));
 				await messageSender.SendMessageAsync(opponent.Socket, new GameFoundMessage(false));
 			}
