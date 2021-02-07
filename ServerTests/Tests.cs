@@ -125,9 +125,8 @@ namespace ServerTests
 
 			await SendThroughSocketAsync(clientSocket1, makeMoveMsg, cts.Token);
 
-			Assert.ThrowsAsync<TaskCanceledException>(async () =>
-				await ReceiveFromSocketAsync<MoveResultMessage>(clientSocket1,
-				timeoutMiliseconds));
+			await ReceiveFromSocketAsync<InvalidStateMessage>(clientSocket1,
+				timeoutMiliseconds);
 		}
 		[Test]
 		public async Task MakingCorrectMoveReturnsMoveResultMessageWithSuccessMessage()

@@ -30,7 +30,13 @@ namespace Server.Sockets.Handlers
 			{
 				session = collections.FindSessionOfAPlayer(player);
 			}
-			catch (InvalidOperationException) { return; }
+			catch (InvalidOperationException)
+			{
+				var msgText = "This player is not connected to any game session.";
+				await messageSender.SendMessageAsync(player.Socket,
+					new InvalidStateMessage(msgText));
+				return;
+			}
 
 			var result = session.Play(player, castedMsg.X, castedMsg.Y);
 			switch (result)
