@@ -114,7 +114,7 @@ namespace ServerTests
 				It.Is<int>(i => i == gameSize)));
 		}
 		[Test]
-		public async Task WhenPlayerIsAlreadyConnectedToAGameSession_SendInvalidStateMessageBack()
+		public async Task WhenPlayerIsAlreadyConnectedToAGameSession_RemoveSessionAndMarkPlayerasSearchingForGame()
 		{
 			int gameSize = 3;
 
@@ -126,11 +126,15 @@ namespace ServerTests
 			playerMock.SetupGet(p => p.GameSessionGUID)
 				.Returns(Guid.NewGuid());
 			playerMock.SetupGet(p => p.Socket).Returns(playerSocketMock.Object);
+			playerMock.Setup(p => p.SetAsSearchingForGame(
+				It.Is<int>(i => i == gameSize)));
 
-			msgSenderMock.Setup(m => m.SendMessageAsync(
-				It.IsAny<IWebSocket>(),
-				It.IsAny<InvalidStateMessage>()))
-				.Returns(() => Task.Delay(0));
+			collectionsMock.Setup(c => c.FindPlayerSearchingForGame(
+				It.Is<IPlayer>(p => p == playerMock.Object)))
+				.Returns(() => throw new InvalidOperationException());
+			collectionsMock.Setup(c => c.RemovePlayer(It.IsAny<IPlayer>()))
+				.Returns(Task.Delay(0));
+			collectionsMock.Setup(c => c.AddPlayer(It.IsAny<IPlayer>()));
 
 			var handler = new FindGameHandler(loggerMock.Object,
 				collectionsMock.Object, sessionFactoryMock.Object,
@@ -139,9 +143,13 @@ namespace ServerTests
 			await handler.HandleMessageAsync(playerMock.Object,
 				new FindGameMessage() { Size = gameSize });
 
-			msgSenderMock.Verify(m => m.SendMessageAsync(
-				It.Is<IWebSocket>(s => s == playerSocketMock.Object),
-				It.IsAny<InvalidStateMessage>()));
+			playerMock.Verify(p => p.SetAsSearchingForGame(It.Is<int>(i => i == gameSize)));
+			collectionsMock.Verify(c => c.FindPlayerSearchingForGame(
+				It.Is<IPlayer>(p => p == playerMock.Object)));
+			collectionsMock.Verify(c => c.RemovePlayer(
+				It.Is<IPlayer>(p => p == playerMock.Object)));
+			collectionsMock.Verify(c => c.AddPlayer(
+				It.Is<IPlayer>(p => p == playerMock.Object)));
 		}
 	}
 }

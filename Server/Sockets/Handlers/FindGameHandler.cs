@@ -28,11 +28,8 @@ namespace Server.Sockets.Handlers
 
 			if (player.GameSessionGUID != Guid.Empty)
 			{
-				var msgText = "This player is already connected to a game session.";
-				logger.LogInformation(msgText);
-				await messageSender.SendMessageAsync(player.Socket,
-					new InvalidStateMessage(msgText));
-				return;
+				await collections.RemovePlayer(player);
+				collections.AddPlayer(player);
 			}
 
 			player.SetAsSearchingForGame(castedMessage.Size);
