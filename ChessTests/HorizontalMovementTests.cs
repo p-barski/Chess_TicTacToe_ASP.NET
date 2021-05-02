@@ -59,12 +59,12 @@ namespace ChessTests
 				.Returns(false);
 
 			var movement = new HorizontalMovement(boardMock.Object);
-			var movements = movement.GetAvailableMoves(rookMock.Object);
+			var availableMoves = movement.GetAvailableMoves(rookMock.Object);
 
-			Assert.AreEqual(7, movements.Count());
-			Assert.IsTrue(movements.All(m => m.StartingPosition == rookPosition));
+			Assert.AreEqual(7, availableMoves.Count());
+			Assert.IsTrue(availableMoves.All(m => m.StartingPosition == rookPosition));
 
-			var finishedPositions = movements
+			var finishedPositions = availableMoves
 				.Select(m => m.FinishedPosition)
 				.ToList();
 
@@ -113,7 +113,7 @@ namespace ChessTests
 				.Returns(ChessColor.Black);
 			queenMock
 				.SetupGet(p => p.PieceType)
-				.Returns(ChessPieceType.Rook);
+				.Returns(ChessPieceType.Queen);
 			queenMock
 				.SetupGet(p => p.Position)
 				.Returns(queenPosition);
@@ -149,12 +149,12 @@ namespace ChessTests
 				.Returns(false);
 
 			var movement = new HorizontalMovement(boardMock.Object);
-			var movements = movement.GetAvailableMoves(queenMock.Object);
+			var availableMoves = movement.GetAvailableMoves(queenMock.Object);
 
-			Assert.AreEqual(4, movements.Count());
-			Assert.IsTrue(movements.All(m => m.StartingPosition == queenPosition));
+			Assert.AreEqual(4, availableMoves.Count());
+			Assert.IsTrue(availableMoves.All(m => m.StartingPosition == queenPosition));
 
-			var finishedPositions = movements
+			var finishedPositions = availableMoves
 				.Select(m => m.FinishedPosition)
 				.ToList();
 
@@ -194,7 +194,7 @@ namespace ChessTests
 				.Returns(ChessColor.White);
 			queenMock
 				.SetupGet(p => p.PieceType)
-				.Returns(ChessPieceType.Rook);
+				.Returns(ChessPieceType.Queen);
 			queenMock
 				.SetupGet(p => p.Position)
 				.Returns(queenPosition);
@@ -242,12 +242,12 @@ namespace ChessTests
 				.Returns(false);
 
 			var movement = new HorizontalMovement(boardMock.Object);
-			var movements = movement.GetAvailableMoves(queenMock.Object);
+			var availableMoves = movement.GetAvailableMoves(queenMock.Object);
 
-			Assert.AreEqual(1, movements.Count());
-			Assert.IsTrue(movements.All(m => m.StartingPosition == queenPosition));
+			Assert.AreEqual(1, availableMoves.Count());
+			Assert.IsTrue(availableMoves.All(m => m.StartingPosition == queenPosition));
 
-			var finishedPositions = movements
+			var finishedPositions = availableMoves
 				.Select(m => m.FinishedPosition)
 				.ToList();
 

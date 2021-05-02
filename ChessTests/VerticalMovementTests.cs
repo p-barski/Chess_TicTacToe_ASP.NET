@@ -113,7 +113,7 @@ namespace ChessTests
 				.Returns(ChessColor.Black);
 			queenMock
 				.SetupGet(p => p.PieceType)
-				.Returns(ChessPieceType.Rook);
+				.Returns(ChessPieceType.Queen);
 			queenMock
 				.SetupGet(p => p.Position)
 				.Returns(queenPosition);
@@ -194,7 +194,7 @@ namespace ChessTests
 				.Returns(ChessColor.White);
 			queenMock
 				.SetupGet(p => p.PieceType)
-				.Returns(ChessPieceType.Rook);
+				.Returns(ChessPieceType.Queen);
 			queenMock
 				.SetupGet(p => p.Position)
 				.Returns(queenPosition);
