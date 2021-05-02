@@ -26,22 +26,22 @@ namespace ChessTests
 			//0                        
 			//  0  1  2  3  4  5  6  7 
 			var boardMock = new Mock<IChessBoard>(MockBehavior.Strict);
-			var targetPiece = new Mock<IReadOnlyChessPiece>(MockBehavior.Strict);
+			var pawnMock = new Mock<IReadOnlyChessPiece>(MockBehavior.Strict);
 			var piecePosition = new Position(3, 1);
 
 			var availableFinishPosition1 = new Position(3, 2);
 			var availableFinishPosition2 = new Position(3, 3);
 
-			targetPiece
+			pawnMock
 				.SetupGet(p => p.Color)
 				.Returns(ChessColor.White);
-			targetPiece
+			pawnMock
 				.SetupGet(p => p.PieceType)
 				.Returns(ChessPieceType.Pawn);
-			targetPiece
+			pawnMock
 				.SetupGet(p => p.Position)
 				.Returns(piecePosition);
-			targetPiece
+			pawnMock
 				.SetupGet(p => p.HasMoved)
 				.Returns(false);
 
@@ -56,15 +56,15 @@ namespace ChessTests
 				.Returns(false);
 
 			var movement = new PawnMovement(boardMock.Object);
-			var movements = movement.GetAvailableMoves(targetPiece.Object);
+			var availableMoves = movement.GetAvailableMoves(pawnMock.Object);
 
-			Assert.AreEqual(2, movements.Count());
-			Assert.IsTrue(movements
+			Assert.AreEqual(2, availableMoves.Count());
+			Assert.IsTrue(availableMoves
 				.Any(m =>
 					m.StartingPosition == piecePosition &&
 					m.FinishedPosition == availableFinishPosition1
 				));
-			Assert.IsTrue(movements
+			Assert.IsTrue(availableMoves
 				.Any(m =>
 					m.StartingPosition == piecePosition &&
 					m.FinishedPosition == availableFinishPosition2
@@ -86,22 +86,22 @@ namespace ChessTests
 			//0                        
 			//  0  1  2  3  4  5  6  7 
 			var boardMock = new Mock<IChessBoard>(MockBehavior.Strict);
-			var targetPiece = new Mock<IReadOnlyChessPiece>(MockBehavior.Strict);
+			var pawnMock = new Mock<IReadOnlyChessPiece>(MockBehavior.Strict);
 			var piecePosition = new Position(4, 6);
 
 			var availableFinishPosition = new Position(4, 5);
 			var unavailableFinishPosition = new Position(4, 4);
 
-			targetPiece
+			pawnMock
 				.SetupGet(p => p.Color)
 				.Returns(ChessColor.Black);
-			targetPiece
+			pawnMock
 				.SetupGet(p => p.PieceType)
 				.Returns(ChessPieceType.Pawn);
-			targetPiece
+			pawnMock
 				.SetupGet(p => p.Position)
 				.Returns(piecePosition);
-			targetPiece
+			pawnMock
 				.SetupGet(p => p.HasMoved)
 				.Returns(false);
 
@@ -116,10 +116,10 @@ namespace ChessTests
 				.Returns(false);
 
 			var movement = new PawnMovement(boardMock.Object);
-			var movements = movement.GetAvailableMoves(targetPiece.Object);
+			var availableMoves = movement.GetAvailableMoves(pawnMock.Object);
 
-			Assert.AreEqual(1, movements.Count());
-			Assert.IsTrue(movements
+			Assert.AreEqual(1, availableMoves.Count());
+			Assert.IsTrue(availableMoves
 				.Any(m =>
 					m.StartingPosition == piecePosition &&
 					m.FinishedPosition == availableFinishPosition
@@ -130,7 +130,7 @@ namespace ChessTests
 		{
 			//BP - black pawn
 			//PM - possible move
-			//EC - enemy chess piece
+			//EP - enemy piece
 			//7                        
 			//6                        
 			//5                        
@@ -141,22 +141,22 @@ namespace ChessTests
 			//0                        
 			//  0  1  2  3  4  5  6  7 
 			var boardMock = new Mock<IChessBoard>(MockBehavior.Strict);
-			var targetPiece = new Mock<IReadOnlyChessPiece>(MockBehavior.Strict);
+			var pawnMock = new Mock<IReadOnlyChessPiece>(MockBehavior.Strict);
 			var piecePosition = new Position(7, 4);
 
 			var availableFinishPosition = new Position(7, 3);
 			var enemyPosition = new Position(6, 3);
 
-			targetPiece
+			pawnMock
 				.SetupGet(p => p.Color)
 				.Returns(ChessColor.Black);
-			targetPiece
+			pawnMock
 				.SetupGet(p => p.PieceType)
 				.Returns(ChessPieceType.Pawn);
-			targetPiece
+			pawnMock
 				.SetupGet(p => p.Position)
 				.Returns(piecePosition);
-			targetPiece
+			pawnMock
 				.SetupGet(p => p.HasMoved)
 				.Returns(true);
 
@@ -175,15 +175,15 @@ namespace ChessTests
 				.Returns(false);
 
 			var movement = new PawnMovement(boardMock.Object);
-			var movements = movement.GetAvailableMoves(targetPiece.Object);
+			var availableMoves = movement.GetAvailableMoves(pawnMock.Object);
 
-			Assert.AreEqual(2, movements.Count());
-			Assert.IsTrue(movements
+			Assert.AreEqual(2, availableMoves.Count());
+			Assert.IsTrue(availableMoves
 				.Any(m =>
 					m.StartingPosition == piecePosition &&
 					m.FinishedPosition == availableFinishPosition
 				));
-			Assert.IsTrue(movements
+			Assert.IsTrue(availableMoves
 				.Any(m =>
 					m.StartingPosition == piecePosition &&
 					m.FinishedPosition == enemyPosition

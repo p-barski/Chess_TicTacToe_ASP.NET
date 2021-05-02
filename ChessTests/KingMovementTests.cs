@@ -58,10 +58,10 @@ namespace ChessTests
 				.Returns(false);
 
 			var movement = new KingMovement(boardMock.Object);
-			var movements = movement.GetAvailableMoves(kingMock.Object);
+			var availableMoves = movement.GetAvailableMoves(kingMock.Object);
 
-			Assert.AreEqual(8, movements.Count());
-			var finishedPositions = movements
+			Assert.AreEqual(8, availableMoves.Count());
+			var finishedPositions = availableMoves
 				.Select(m => m.FinishedPosition)
 				.ToList();
 
@@ -92,8 +92,6 @@ namespace ChessTests
 			//  0  1  2  3  4  5  6  7 
 			var boardMock = new Mock<IChessBoard>(MockBehavior.Strict);
 			var kingMock = new Mock<IReadOnlyChessPiece>(MockBehavior.Strict);
-			var blackPawnMock = new Mock<IReadOnlyChessPiece>(MockBehavior.Strict);
-			var enemyMock = new Mock<IReadOnlyChessPiece>(MockBehavior.Strict);
 
 			var kingPosition = new Position(7, 7);
 
@@ -111,32 +109,6 @@ namespace ChessTests
 				.SetupGet(p => p.Position)
 				.Returns(kingPosition);
 			kingMock
-				.SetupGet(p => p.HasMoved)
-				.Returns(true);
-
-			blackPawnMock
-				.SetupGet(p => p.Color)
-				.Returns(ChessColor.Black);
-			blackPawnMock
-				.SetupGet(p => p.PieceType)
-				.Returns(ChessPieceType.Pawn);
-			blackPawnMock
-				.SetupGet(p => p.Position)
-				.Returns(blackPawnPosition);
-			blackPawnMock
-				.SetupGet(p => p.HasMoved)
-				.Returns(false);
-
-			enemyMock
-				.SetupGet(p => p.Color)
-				.Returns(ChessColor.White);
-			enemyMock
-				.SetupGet(p => p.PieceType)
-				.Returns(ChessPieceType.Rook);
-			enemyMock
-				.SetupGet(p => p.Position)
-				.Returns(enemyPosition);
-			enemyMock
 				.SetupGet(p => p.HasMoved)
 				.Returns(true);
 
@@ -162,10 +134,10 @@ namespace ChessTests
 
 
 			var movement = new KingMovement(boardMock.Object);
-			var movements = movement.GetAvailableMoves(kingMock.Object);
+			var availableMoves = movement.GetAvailableMoves(kingMock.Object);
 
-			Assert.AreEqual(2, movements.Count());
-			var finishedPositions = movements
+			Assert.AreEqual(2, availableMoves.Count());
+			var finishedPositions = availableMoves
 				.Select(m => m.FinishedPosition)
 				.ToList();
 

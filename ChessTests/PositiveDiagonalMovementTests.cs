@@ -94,7 +94,6 @@ namespace ChessTests
 			//  0  1  2  3  4  5  6  7 
 			var boardMock = new Mock<IChessBoard>(MockBehavior.Strict);
 			var queenMock = new Mock<IReadOnlyChessPiece>(MockBehavior.Strict);
-			var enemyMock = new Mock<IReadOnlyChessPiece>(MockBehavior.Strict);
 
 			var queenPosition = new Position(6, 5);
 			var enemyPosition = new Position(3, 2);
@@ -118,19 +117,6 @@ namespace ChessTests
 				.SetupGet(p => p.Position)
 				.Returns(queenPosition);
 			queenMock
-				.SetupGet(p => p.HasMoved)
-				.Returns(true);
-
-			enemyMock
-				.SetupGet(p => p.Color)
-				.Returns(ChessColor.White);
-			enemyMock
-				.SetupGet(p => p.PieceType)
-				.Returns(ChessPieceType.Pawn);
-			enemyMock
-				.SetupGet(p => p.Position)
-				.Returns(enemyPosition);
-			enemyMock
 				.SetupGet(p => p.HasMoved)
 				.Returns(true);
 
@@ -180,8 +166,6 @@ namespace ChessTests
 			//  0  1  2  3  4  5  6  7 
 			var boardMock = new Mock<IChessBoard>(MockBehavior.Strict);
 			var queenMock = new Mock<IReadOnlyChessPiece>(MockBehavior.Strict);
-			var pawnMock1 = new Mock<IReadOnlyChessPiece>(MockBehavior.Strict);
-			var pawnMock2 = new Mock<IReadOnlyChessPiece>(MockBehavior.Strict);
 
 			var queenPosition = new Position(3, 3);
 			var pawn1Position = new Position(2, 2);
@@ -199,32 +183,6 @@ namespace ChessTests
 				.SetupGet(p => p.Position)
 				.Returns(queenPosition);
 			queenMock
-				.SetupGet(p => p.HasMoved)
-				.Returns(true);
-
-			pawnMock1
-				.SetupGet(p => p.Color)
-				.Returns(ChessColor.White);
-			pawnMock1
-				.SetupGet(p => p.PieceType)
-				.Returns(ChessPieceType.Pawn);
-			pawnMock1
-				.SetupGet(p => p.Position)
-				.Returns(pawn1Position);
-			pawnMock1
-				.SetupGet(p => p.HasMoved)
-				.Returns(true);
-
-			pawnMock2
-				.SetupGet(p => p.Color)
-				.Returns(ChessColor.White);
-			pawnMock2
-				.SetupGet(p => p.PieceType)
-				.Returns(ChessPieceType.Pawn);
-			pawnMock2
-				.SetupGet(p => p.Position)
-				.Returns(pawn2Position);
-			pawnMock2
 				.SetupGet(p => p.HasMoved)
 				.Returns(true);
 
