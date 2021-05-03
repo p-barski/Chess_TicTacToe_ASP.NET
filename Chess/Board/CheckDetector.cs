@@ -1,5 +1,4 @@
 using System.Linq;
-using Chess.Game;
 using Chess.Pieces;
 using Chess.Movement;
 
@@ -14,28 +13,15 @@ namespace Chess.Board
 			this.chessBoard = chessBoard;
 			this.movement = movement;
 		}
-		public ChessPlayResult IsChecked(ChessColor kingColor)
+		public bool IsChecked(ChessColor kingColor)
 		{
 			var king = chessBoard.GetKing(kingColor);
-			var isChecked = chessBoard.Pieces
+			return chessBoard.Pieces
 				.Where(p => p.Color != kingColor)
 				.Any(p => movement
 					.GetAvailableMoves(p)
 					.Any(m => m.FinishedPosition == king.Position)
 				);
-			if (isChecked)
-			{
-				return ReturnCheck(kingColor);
-			}
-			return ChessPlayResult.SuccessfulMove;
-		}
-		private ChessPlayResult ReturnCheck(ChessColor kingColor)
-		{
-			if (kingColor == ChessColor.Black)
-			{
-				return ChessPlayResult.BlackChecked;
-			}
-			return ChessPlayResult.WhiteChecked;
 		}
 	}
 }

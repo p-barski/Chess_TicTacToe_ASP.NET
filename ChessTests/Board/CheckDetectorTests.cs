@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using Moq;
 using NUnit.Framework;
 using Chess;
-using Chess.Game;
 using Chess.Board;
 using Chess.Pieces;
 using Chess.Movement;
@@ -12,7 +11,7 @@ namespace ChessTests
 	public class CheckDetectorTests
 	{
 		[Test]
-		public void WhenWhiteKingIsCheckedReturnsWhiteKingChecked()
+		public void WhenWhiteKingIsCheckedReturnsTrue()
 		{
 			//WK - white king
 			//BP - black pawn
@@ -68,10 +67,10 @@ namespace ChessTests
 
 			var isChecked = checkDetector.IsChecked(kingColor);
 
-			Assert.AreEqual(ChessPlayResult.WhiteChecked, isChecked);
+			Assert.AreEqual(true, isChecked);
 		}
 		[Test]
-		public void WhenBlackKingIsCheckedReturnsBlackKingChecked()
+		public void WhenBlackKingIsCheckedReturnsTrue()
 		{
 			//BK - black king
 			//WP - white pawn
@@ -127,10 +126,10 @@ namespace ChessTests
 
 			var isChecked = checkDetector.IsChecked(kingColor);
 
-			Assert.AreEqual(ChessPlayResult.BlackChecked, isChecked);
+			Assert.AreEqual(true, isChecked);
 		}
 		[Test]
-		public void WhenKingIsNotCheckedReturnSuccessfulMove()
+		public void WhenKingIsNotCheckedReturnsFalse()
 		{
 			//BK - black king
 			//WP - white pawn
@@ -185,7 +184,7 @@ namespace ChessTests
 
 			var isChecked = checkDetector.IsChecked(kingColor);
 
-			Assert.AreEqual(ChessPlayResult.SuccessfulMove, isChecked);
+			Assert.AreEqual(false, isChecked);
 		}
 	}
 }
