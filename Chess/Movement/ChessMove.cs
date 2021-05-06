@@ -29,5 +29,9 @@ namespace Chess.Movement
 		{
 			return new ChessMove(StartingPosition, FinishedPosition, true, PawnPromotion);
 		}
+		public override string ToString()
+		{
+			return $"{StartingPosition}->{FinishedPosition}, {IsCapture}, {PawnPromotion}";
+		}
 	}
 }
