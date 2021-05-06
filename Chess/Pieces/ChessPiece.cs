@@ -2,7 +2,7 @@ namespace Chess.Pieces
 {
 	public class ChessPiece : IChessPiece
 	{
-		public ChessPieceType PieceType { get; }
+		public ChessPieceType PieceType { get; private set; }
 		public ChessColor Color { get; }
 		public Position Position { get; set; }
 		public bool HasMoved { get => moveCounter > 0; }
@@ -20,6 +20,14 @@ namespace Chess.Pieces
 		public void DecrementMoveCounter()
 		{
 			moveCounter--;
+		}
+		public void Promote(ChessPieceType promotionPiece)
+		{
+			PieceType = promotionPiece;
+		}
+		public void Depromote()
+		{
+			PieceType = ChessPieceType.Pawn;
 		}
 	}
 }
