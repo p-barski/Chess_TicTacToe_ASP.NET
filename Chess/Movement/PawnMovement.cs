@@ -28,7 +28,6 @@ namespace Chess.Movement
 			AddNormalMoves(chessPiece, yDirection, availableMoves);
 			AddPossibleRightCapture(chessPiece, yDirection, availableMoves);
 			AddPossibleLeftCapture(chessPiece, yDirection, availableMoves);
-			//TODO en passant
 
 			return availableMoves;
 		}
@@ -50,7 +49,7 @@ namespace Chess.Movement
 				return;
 			}
 
-			var chessMove = new ChessMove(chessPiece.Position, possibleDestination, false);
+			var chessMove = new ChessMove(chessPiece.Position, possibleDestination);
 			availableMoves.Add(chessMove);
 			AddDoubleMove(chessPiece, yDirection, availableMoves);
 		}
@@ -67,7 +66,7 @@ namespace Chess.Movement
 			{
 				return;
 			}
-			var chessMove = new ChessMove(chessPiece.Position, possibleDestination, false);
+			var chessMove = new ChessMove(chessPiece.Position, possibleDestination);
 			availableMoves.Add(chessMove);
 		}
 		private void AddPossibleRightCapture(IReadOnlyChessPiece chessPiece, int yDirection,
@@ -88,7 +87,7 @@ namespace Chess.Movement
 				return;
 			}
 
-			var chessMove = new ChessMove(chessPiece.Position, possibleCapturePosition, true);
+			var chessMove = new ChessMove(chessPiece.Position, possibleCapturePosition);
 			availableMoves.Add(chessMove);
 		}
 		private void AddPossibleLeftCapture(IReadOnlyChessPiece chessPiece, int yDirection,
@@ -109,7 +108,7 @@ namespace Chess.Movement
 				return;
 			}
 
-			var chessMove = new ChessMove(chessPiece.Position, possibleCapturePosition, true);
+			var chessMove = new ChessMove(chessPiece.Position, possibleCapturePosition);
 			availableMoves.Add(chessMove);
 		}
 	}
