@@ -199,7 +199,7 @@ namespace ChessTests
 
 			var kingPosition = new Position(4, 0);
 			var rookPosition = new Position(0, 0);
-			var whiteQueenPosition = new Position(2, 7);
+			var blackQueenPosition = new Position(2, 7);
 
 			var emptyPositions = new List<Position>(){
 				new Position(1, 0), new Position(2, 0), new Position(3, 0)
@@ -239,7 +239,7 @@ namespace ChessTests
 				.Returns(ChessPieceType.Queen);
 			blackQueenMock
 				.SetupGet(p => p.Position)
-				.Returns(whiteQueenPosition);
+				.Returns(blackQueenPosition);
 			blackQueenMock
 				.SetupGet(p => p.HasMoved)
 				.Returns(true);
@@ -256,7 +256,7 @@ namespace ChessTests
 				.Returns(pieces);
 
 			var queenMoves = new List<ChessMove>(){
-				new ChessMove(whiteQueenPosition, new Position(2, 0))
+				new ChessMove(blackQueenPosition, new Position(2, 0))
 			};
 
 			movementMock
