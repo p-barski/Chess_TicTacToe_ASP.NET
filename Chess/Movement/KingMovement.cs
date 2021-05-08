@@ -37,7 +37,6 @@ namespace Chess.Movement
 					availableMoves.Add(new ChessMove(chessPiece.Position, position));
 				}
 			}
-			//TODO castling
 			return availableMoves;
 		}
 		private List<Position> GetNearestPositions(Position position)
