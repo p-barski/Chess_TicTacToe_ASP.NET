@@ -15,6 +15,7 @@ namespace ChessTests
 			var movementHistory = new Mock<IMovementHistory>(MockBehavior.Strict);
 			var promoterMock = new Mock<IPiecePromoter>(MockBehavior.Strict);
 			var castlingMoverMock = new Mock<ICastlingMover>(MockBehavior.Strict);
+			var enPassantMoverMock = new Mock<IEnPassantMover>(MockBehavior.Strict);
 
 			var pieces = new List<IChessPiece>();
 			var chessMove = new ChessMove(new Position(0, 0), new Position(0, 0),
@@ -25,7 +26,7 @@ namespace ChessTests
 				.Returns(true);
 
 			var pieceMover = new PieceMover(movementHistory.Object, promoterMock.Object,
-				castlingMoverMock.Object);
+				castlingMoverMock.Object, enPassantMoverMock.Object);
 			var result = pieceMover.Move(chessMove, pieces);
 
 			Assert.AreEqual(null, result);
@@ -36,6 +37,7 @@ namespace ChessTests
 			var movementHistory = new Mock<IMovementHistory>(MockBehavior.Strict);
 			var promoterMock = new Mock<IPiecePromoter>(MockBehavior.Strict);
 			var castlingMoverMock = new Mock<ICastlingMover>(MockBehavior.Strict);
+			var enPassantMoverMock = new Mock<IEnPassantMover>(MockBehavior.Strict);
 
 			var pieces = new List<IChessPiece>();
 			var chessMove = new ChessMove(new Position(4, 7), new Position(0, 7));
@@ -49,10 +51,40 @@ namespace ChessTests
 				.Returns(true);
 
 			var pieceMover = new PieceMover(movementHistory.Object, promoterMock.Object,
-				castlingMoverMock.Object);
+				castlingMoverMock.Object, enPassantMoverMock.Object);
 			var result = pieceMover.Move(chessMove, pieces);
 
 			Assert.AreEqual(null, result);
+		}
+		[Test]
+		public void WhenEnPassantMoveIsPassed_Move_ReturnsRemovedPawn()
+		{
+			var movementHistory = new Mock<IMovementHistory>(MockBehavior.Strict);
+			var promoterMock = new Mock<IPiecePromoter>(MockBehavior.Strict);
+			var castlingMoverMock = new Mock<ICastlingMover>(MockBehavior.Strict);
+			var enPassantMoverMock = new Mock<IEnPassantMover>(MockBehavior.Strict);
+			var pawnToRemoveMock = new Mock<IChessPiece>(MockBehavior.Strict);
+
+			var pieces = new List<IChessPiece>();
+			var chessMove = new ChessMove(new Position(4, 7), new Position(0, 7));
+
+			promoterMock
+				.Setup(p => p.PromoteIfPromotionMove(chessMove, pieces))
+				.Returns(false);
+
+			castlingMoverMock
+				.Setup(c => c.PerformCastlingIfCastlingMove(chessMove, pieces))
+				.Returns(false);
+
+			enPassantMoverMock
+				.Setup(e => e.PerformEnPassantIfApplicable(chessMove, pieces))
+				.Returns(pawnToRemoveMock.Object);
+
+			var pieceMover = new PieceMover(movementHistory.Object, promoterMock.Object,
+				castlingMoverMock.Object, enPassantMoverMock.Object);
+			var result = pieceMover.Move(chessMove, pieces);
+
+			Assert.AreEqual(pawnToRemoveMock.Object, result);
 		}
 		[Test]
 		public void WhenThereIsNoCapture_Move_ReturnsNull_IncrementsMoveCounter_AndAddsMoveToMovmentHistory()
@@ -60,6 +92,7 @@ namespace ChessTests
 			var movementHistory = new Mock<IMovementHistory>(MockBehavior.Strict);
 			var promoterMock = new Mock<IPiecePromoter>(MockBehavior.Strict);
 			var castlingMoverMock = new Mock<ICastlingMover>(MockBehavior.Strict);
+			var enPassantMoverMock = new Mock<IEnPassantMover>(MockBehavior.Strict);
 			var movedPieceMock = new Mock<IChessPiece>(MockBehavior.Strict);
 			var otherPieceMock = new Mock<IChessPiece>(MockBehavior.Strict);
 
@@ -92,11 +125,15 @@ namespace ChessTests
 				.Setup(c => c.PerformCastlingIfCastlingMove(chessMove, pieces))
 				.Returns(false);
 
+			enPassantMoverMock
+				.Setup(e => e.PerformEnPassantIfApplicable(chessMove, pieces))
+				.Returns<IChessPiece>(null);
+
 			movementHistory
 				.Setup(h => h.Add(chessMove));
 
 			var pieceMover = new PieceMover(movementHistory.Object, promoterMock.Object,
-				castlingMoverMock.Object);
+				castlingMoverMock.Object, enPassantMoverMock.Object);
 			var result = pieceMover.Move(chessMove, pieces);
 
 			Assert.AreEqual(null, result);
@@ -113,6 +150,7 @@ namespace ChessTests
 			var movementHistory = new Mock<IMovementHistory>(MockBehavior.Strict);
 			var promoterMock = new Mock<IPiecePromoter>(MockBehavior.Strict);
 			var castlingMoverMock = new Mock<ICastlingMover>(MockBehavior.Strict);
+			var enPassantMoverMock = new Mock<IEnPassantMover>(MockBehavior.Strict);
 			var movedPieceMock = new Mock<IChessPiece>(MockBehavior.Strict);
 			var otherPieceMock = new Mock<IChessPiece>(MockBehavior.Strict);
 			var capturedPieceMock = new Mock<IChessPiece>(MockBehavior.Strict);
@@ -150,11 +188,15 @@ namespace ChessTests
 				.Setup(c => c.PerformCastlingIfCastlingMove(chessMove, pieces))
 				.Returns(false);
 
+			enPassantMoverMock
+				.Setup(e => e.PerformEnPassantIfApplicable(chessMove, pieces))
+				.Returns<IChessPiece>(null);
+
 			movementHistory
 				.Setup(h => h.Add(chessMove.ReturnWithCaptureAsTrue()));
 
 			var pieceMover = new PieceMover(movementHistory.Object, promoterMock.Object,
-				castlingMoverMock.Object);
+				castlingMoverMock.Object, enPassantMoverMock.Object);
 			var result = pieceMover.Move(chessMove, pieces);
 
 			Assert.AreEqual(capturedPieceMock.Object, result);
@@ -171,6 +213,7 @@ namespace ChessTests
 			var movementHistory = new Mock<IMovementHistory>(MockBehavior.Strict);
 			var promoterMock = new Mock<IPiecePromoter>(MockBehavior.Strict);
 			var castlingMoverMock = new Mock<ICastlingMover>(MockBehavior.Strict);
+			var enPassantMoverMock = new Mock<IEnPassantMover>(MockBehavior.Strict);
 			var pawnMock = new Mock<IChessPiece>(MockBehavior.Strict);
 
 			var pawnPreviousPosition = new Position(3, 6);
@@ -205,7 +248,7 @@ namespace ChessTests
 				.Returns(promotionMove);
 
 			var pieceMover = new PieceMover(movementHistory.Object, promoterMock.Object,
-				castlingMoverMock.Object);
+				castlingMoverMock.Object, enPassantMoverMock.Object);
 			var result = pieceMover.ReverseLastMove(pieces);
 
 			Assert.AreEqual(pawnMoveBeforePromotion.IsCapture, result);
@@ -222,6 +265,7 @@ namespace ChessTests
 			var movementHistory = new Mock<IMovementHistory>(MockBehavior.Strict);
 			var promoterMock = new Mock<IPiecePromoter>(MockBehavior.Strict);
 			var castlingMoverMock = new Mock<ICastlingMover>(MockBehavior.Strict);
+			var enPassantMoverMock = new Mock<IEnPassantMover>(MockBehavior.Strict);
 
 			var pieces = new List<IChessPiece>();
 			var castlingMove = new ChessMove(new Position(4, 7), new Position(0, 7));
@@ -235,7 +279,7 @@ namespace ChessTests
 				.Returns(castlingMove);
 
 			var pieceMover = new PieceMover(movementHistory.Object, promoterMock.Object,
-				castlingMoverMock.Object);
+				castlingMoverMock.Object, enPassantMoverMock.Object);
 			var result = pieceMover.ReverseLastMove(pieces);
 
 			Assert.AreEqual(false, result);
@@ -246,6 +290,7 @@ namespace ChessTests
 			var movementHistory = new Mock<IMovementHistory>(MockBehavior.Strict);
 			var promoterMock = new Mock<IPiecePromoter>(MockBehavior.Strict);
 			var castlingMoverMock = new Mock<ICastlingMover>(MockBehavior.Strict);
+			var enPassantMoverMock = new Mock<IEnPassantMover>(MockBehavior.Strict);
 			var movedPieceMock = new Mock<IChessPiece>(MockBehavior.Strict);
 			var otherPieceMock = new Mock<IChessPiece>(MockBehavior.Strict);
 
@@ -284,7 +329,7 @@ namespace ChessTests
 				.Returns(lastChessMove);
 
 			var pieceMover = new PieceMover(movementHistory.Object, promoterMock.Object,
-				castlingMoverMock.Object);
+				castlingMoverMock.Object, enPassantMoverMock.Object);
 			var result = pieceMover.ReverseLastMove(pieces);
 
 			Assert.AreEqual(false, result);
@@ -301,6 +346,7 @@ namespace ChessTests
 			var movementHistory = new Mock<IMovementHistory>(MockBehavior.Strict);
 			var promoterMock = new Mock<IPiecePromoter>(MockBehavior.Strict);
 			var castlingMoverMock = new Mock<ICastlingMover>(MockBehavior.Strict);
+			var enPassantMoverMock = new Mock<IEnPassantMover>(MockBehavior.Strict);
 			var movedPieceMock = new Mock<IChessPiece>(MockBehavior.Strict);
 			var otherPieceMock = new Mock<IChessPiece>(MockBehavior.Strict);
 			var capturedPieceMock = new Mock<IChessPiece>(MockBehavior.Strict);
@@ -340,7 +386,7 @@ namespace ChessTests
 				.Returns(lastChessMove);
 
 			var pieceMover = new PieceMover(movementHistory.Object, promoterMock.Object,
-				castlingMoverMock.Object);
+				castlingMoverMock.Object, enPassantMoverMock.Object);
 			var result = pieceMover.ReverseLastMove(pieces);
 
 			Assert.AreEqual(true, result);

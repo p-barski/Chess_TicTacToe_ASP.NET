@@ -10,12 +10,14 @@ namespace Chess.Movement
 		private readonly IMovementHistory history;
 		private readonly IPiecePromoter piecePromoter;
 		private readonly ICastlingMover castlingMover;
+		private readonly IEnPassantMover enPassantMover;
 		public PieceMover(IMovementHistory history, IPiecePromoter piecePromoter,
-			ICastlingMover castlingMover)
+			ICastlingMover castlingMover, IEnPassantMover enPassantMover)
 		{
 			this.history = history;
 			this.piecePromoter = piecePromoter;
 			this.castlingMover = castlingMover;
+			this.enPassantMover = enPassantMover;
 		}
 		public IChessPiece Move(ChessMove chessMove, IEnumerable<IChessPiece> pieces)
 		{
@@ -27,9 +29,16 @@ namespace Chess.Movement
 			{
 				return null;
 			}
+
+			var pieceToRemove = enPassantMover.PerformEnPassantIfApplicable(chessMove, pieces);
+			if (pieceToRemove != null)
+			{
+				return pieceToRemove;
+			}
+
 			var pieceToMove = pieces
 				.First(p => p.Position == chessMove.StartingPosition);
-			var pieceToRemove = pieces
+			pieceToRemove = pieces
 				.FirstOrDefault(p => p.Position == chessMove.FinishedPosition);
 			pieceToMove.Position = chessMove.FinishedPosition;
 			pieceToMove.IncrementMoveCounter();
