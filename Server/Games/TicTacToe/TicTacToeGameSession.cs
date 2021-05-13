@@ -20,16 +20,19 @@ namespace Server.Games.TicTacToe
 
 					PlayerOne = playerOne;
 					PlayerTwo = playerTwo;
-					PlayerOne.AddToGame(GUID, XO_Enum.X);
-					PlayerTwo.AddToGame(GUID, XO_Enum.O);
+					PlayerOne.AddToGame(GUID, new PlayerType<XO_Enum>(XO_Enum.X));
+					PlayerTwo.AddToGame(GUID, new PlayerType<XO_Enum>(XO_Enum.O));
 					game = new Game(size);
 				}
 			}
 		}
 		public PlayResult Play(IPlayer from, IGameMove gameMove)
 		{
-			if (from.Sign != game.CurrentPlayer)
+			if (from.PlayerType.StringRepresentation
+				.ToEnum<XO_Enum>() != game.CurrentPlayer)
+			{
 				return PlayResult.NotYourTurn;
+			}
 			TicTacToeMove tttMove;
 			try
 			{

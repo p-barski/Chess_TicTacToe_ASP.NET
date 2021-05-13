@@ -8,7 +8,7 @@ namespace Server.Games
 	{
 		public Guid GUID { get; } = Guid.NewGuid();
 		public IWebSocket Socket { get; }
-		public XO_Enum Sign { get; private set; }
+		public IPlayerType PlayerType { get; private set; }
 		public int ExpectedBoardSize { get; private set; }
 		public PlayerState State { get; private set; } = PlayerState.Idle;
 		public Guid GameSessionGUID { get; private set; } = Guid.Empty;
@@ -16,10 +16,10 @@ namespace Server.Games
 		{
 			Socket = socket;
 		}
-		public void AddToGame(Guid gameGUID, XO_Enum sign)
+		public void AddToGame(Guid gameGUID, IPlayerType playerType)
 		{
 			GameSessionGUID = gameGUID;
-			Sign = sign;
+			PlayerType = playerType;
 			State = PlayerState.Playing;
 		}
 		public void RemoveFromGame()

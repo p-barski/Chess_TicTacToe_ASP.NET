@@ -8,11 +8,11 @@ namespace Server.Games
 	{
 		Guid GUID { get; }
 		IWebSocket Socket { get; }
-		XO_Enum Sign { get; }
+		IPlayerType PlayerType { get; }
 		int ExpectedBoardSize { get; }
 		PlayerState State { get; }
 		Guid GameSessionGUID { get; }
-		void AddToGame(Guid gameGUID, XO_Enum sign);
+		void AddToGame(Guid gameGUID, IPlayerType playerType);
 		void RemoveFromGame();
 		void SetAsSearchingForGame(int size);
 	}
