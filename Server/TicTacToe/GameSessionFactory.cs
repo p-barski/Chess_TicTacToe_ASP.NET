@@ -4,7 +4,7 @@ namespace Server.TicTacToe
 	{
 		public IGameSession Create(IPlayer playerOne, IPlayer playerTwo, int size)
 		{
-			return new GameSession(playerOne, playerTwo, size);
+			return new TicTacToeGameSession(playerOne, playerTwo, size);
 		}
 	}
 }

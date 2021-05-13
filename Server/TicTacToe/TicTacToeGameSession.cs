@@ -3,13 +3,13 @@ using TicTacToe;
 
 namespace Server.TicTacToe
 {
-	public class GameSession : IGameSession
+	public class TicTacToeGameSession : IGameSession
 	{
 		public Guid GUID { get; } = Guid.NewGuid();
 		public IPlayer PlayerOne { get; }
 		public IPlayer PlayerTwo { get; }
 		private Game game;
-		public GameSession(IPlayer playerOne, IPlayer playerTwo, int size)
+		public TicTacToeGameSession(IPlayer playerOne, IPlayer playerTwo, int size)
 		{
 			lock (playerOne)
 			{
