@@ -26,14 +26,24 @@ namespace Server.Games.TicTacToe
 				}
 			}
 		}
-		public PlayResult Play(IPlayer from, int x, int y)
+		public PlayResult Play(IPlayer from, IGameMove gameMove)
 		{
 			if (from.Sign != game.CurrentPlayer)
 				return PlayResult.NotYourTurn;
+			TicTacToeMove tttMove;
+			try
+			{
+				tttMove = (TicTacToeMove)gameMove;
+			}
+			catch (InvalidCastException)
+			{
+				return PlayResult.Error;
+			}
+
 			XO_Enum result;
 			try
 			{
-				result = game.Set(x, y);
+				result = game.Set(tttMove.X, tttMove.Y);
 			}
 			catch (InvalidOperationException)
 			{

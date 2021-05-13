@@ -30,13 +30,15 @@ namespace ServerTests
 			var senderSocketMock = new Mock<IWebSocket>(MockBehavior.Strict);
 			var opponentSocketMock = new Mock<IWebSocket>(MockBehavior.Strict);
 
+			var gameMove = new TicTacToeMove(x, y);
+
 			senderMock.SetupGet(p => p.Socket).Returns(senderSocketMock.Object);
 			opponentMock.SetupGet(p => p.Socket).Returns(opponentSocketMock.Object);
 
 			sessionMock.SetupGet(s => s.PlayerOne).Returns(senderMock.Object);
 			sessionMock.SetupGet(s => s.PlayerTwo).Returns(opponentMock.Object);
 
-			sessionMock.Setup(s => s.Play(senderMock.Object, x, y))
+			sessionMock.Setup(s => s.Play(senderMock.Object, gameMove))
 				.Returns(PlayResult.Draw);
 
 			collectionsMock.Setup(c => c.FindSessionOfAPlayer(
@@ -78,13 +80,15 @@ namespace ServerTests
 			var senderSocketMock = new Mock<IWebSocket>(MockBehavior.Strict);
 			var opponentSocketMock = new Mock<IWebSocket>(MockBehavior.Strict);
 
+			var gameMove = new TicTacToeMove(x, y);
+
 			senderMock.SetupGet(p => p.Socket).Returns(senderSocketMock.Object);
 			opponentMock.SetupGet(p => p.Socket).Returns(opponentSocketMock.Object);
 
 			sessionMock.SetupGet(s => s.PlayerOne).Returns(senderMock.Object);
 			sessionMock.SetupGet(s => s.PlayerTwo).Returns(opponentMock.Object);
 
-			sessionMock.Setup(s => s.Play(senderMock.Object, x, y))
+			sessionMock.Setup(s => s.Play(senderMock.Object, gameMove))
 				.Returns(PlayResult.Success);
 
 			collectionsMock.Setup(c => c.FindSessionOfAPlayer(
@@ -124,13 +128,15 @@ namespace ServerTests
 			var senderSocketMock = new Mock<IWebSocket>(MockBehavior.Strict);
 			var opponentSocketMock = new Mock<IWebSocket>(MockBehavior.Strict);
 
+			var gameMove = new TicTacToeMove(x, y);
+
 			senderMock.SetupGet(p => p.Socket).Returns(senderSocketMock.Object);
 			opponentMock.SetupGet(p => p.Socket).Returns(opponentSocketMock.Object);
 
 			sessionMock.SetupGet(s => s.PlayerOne).Returns(senderMock.Object);
 			sessionMock.SetupGet(s => s.PlayerTwo).Returns(opponentMock.Object);
 
-			sessionMock.Setup(s => s.Play(senderMock.Object, x, y))
+			sessionMock.Setup(s => s.Play(senderMock.Object, gameMove))
 				.Returns(PlayResult.YouWin);
 
 			collectionsMock.Setup(c => c.FindSessionOfAPlayer(
@@ -172,12 +178,14 @@ namespace ServerTests
 			var sessionMock = new Mock<IGameSession>(MockBehavior.Strict);
 			var senderSocketMock = new Mock<IWebSocket>(MockBehavior.Strict);
 
+			var gameMove = new TicTacToeMove(x, y);
+
 			senderMock.SetupGet(p => p.Socket).Returns(senderSocketMock.Object);
 
 			sessionMock.SetupGet(s => s.PlayerOne).Returns(senderMock.Object);
 			sessionMock.SetupGet(s => s.PlayerTwo).Returns(opponentMock.Object);
 
-			sessionMock.Setup(s => s.Play(senderMock.Object, x, y))
+			sessionMock.Setup(s => s.Play(senderMock.Object, gameMove))
 				.Returns(PlayResult.NotYourTurn);
 
 			collectionsMock.Setup(c => c.FindSessionOfAPlayer(
@@ -212,12 +220,14 @@ namespace ServerTests
 			var sessionMock = new Mock<IGameSession>(MockBehavior.Strict);
 			var senderSocketMock = new Mock<IWebSocket>(MockBehavior.Strict);
 
+			var gameMove = new TicTacToeMove(x, y);
+
 			senderMock.SetupGet(p => p.Socket).Returns(senderSocketMock.Object);
 
 			sessionMock.SetupGet(s => s.PlayerOne).Returns(senderMock.Object);
 			sessionMock.SetupGet(s => s.PlayerTwo).Returns(opponentMock.Object);
 
-			sessionMock.Setup(s => s.Play(senderMock.Object, x, y))
+			sessionMock.Setup(s => s.Play(senderMock.Object, gameMove))
 				.Returns(PlayResult.PositionTaken);
 
 			collectionsMock.Setup(c => c.FindSessionOfAPlayer(

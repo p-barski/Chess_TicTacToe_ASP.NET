@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Server.Games;
+using Server.Games.TicTacToe;
 using Server.Sockets.Other;
 using Server.Sockets.Messages;
 
@@ -38,7 +39,7 @@ namespace Server.Sockets.Handlers
 				return;
 			}
 
-			var result = session.Play(player, castedMsg.X, castedMsg.Y);
+			var result = session.Play(player, new TicTacToeMove(castedMsg.X, castedMsg.Y));
 			switch (result)
 			{
 				case PlayResult.Success:

@@ -7,7 +7,7 @@ namespace Server.Games
 		Guid GUID { get; }
 		IPlayer PlayerOne { get; }
 		IPlayer PlayerTwo { get; }
-		PlayResult Play(IPlayer from, int x, int y);
+		PlayResult Play(IPlayer from, IGameMove gameMove);
 		void Close();
 	}
 }
