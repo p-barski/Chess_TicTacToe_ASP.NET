@@ -1,6 +1,6 @@
 using System;
 
-namespace Server.Games
+namespace Server.Games.TicTacToe
 {
 	public class TicTacToeMove : IGameMove
 	{
