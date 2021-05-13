@@ -25,7 +25,7 @@ namespace ServerTests
 			host = Program.CreateHostBuilder(new string[0]).Build();
 			serverThread = new Thread(() => host.Start());
 			serverThread.Start();
-			await Task.Delay(100);
+			await Task.Delay(50);
 		}
 		[TearDown]
 		public async Task TearDown()
@@ -55,7 +55,7 @@ namespace ServerTests
 
 			Assert.ThrowsAsync<TaskCanceledException>(async () =>
 				await ReceiveFromSocketAsync<GameFoundMessage>(
-				clientSocket2, timeoutMiliseconds));
+				clientSocket2));
 		}
 		[Test]
 		public async Task SessionClosedMessageIsSendWhenAnotherPlayerDisconnects()
@@ -74,14 +74,14 @@ namespace ServerTests
 			await SendThroughSocketAsync(clientSocket2, findMsg, cts.Token);
 
 			await ReceiveFromSocketAsync<GameFoundMessage>(
-				clientSocket1, timeoutMiliseconds);
+				clientSocket1);
 			await ReceiveFromSocketAsync<GameFoundMessage>(
-				clientSocket2, timeoutMiliseconds);
+				clientSocket2);
 
 			var status = WebSocketCloseStatus.NormalClosure;
 			await clientSocket1.CloseAsync(status, "", cts.Token);
 			await ReceiveFromSocketAsync<SessionClosedMessage>(
-				clientSocket2, timeoutMiliseconds);
+				clientSocket2);
 
 			await clientSocket2.CloseAsync(status, "", cts.Token);
 		}
@@ -102,9 +102,9 @@ namespace ServerTests
 			await SendThroughSocketAsync(clientSocket2, findMsg, cts.Token);
 
 			var gameFoundMsg1 = await ReceiveFromSocketAsync<GameFoundMessage>(
-				clientSocket1, timeoutMiliseconds);
+				clientSocket1);
 			var gameFoundMsg2 = await ReceiveFromSocketAsync<GameFoundMessage>(
-				clientSocket2, timeoutMiliseconds);
+				clientSocket2);
 
 			Assert.AreNotEqual(gameFoundMsg1.IsClientTurn,
 				gameFoundMsg2.IsClientTurn);
@@ -125,8 +125,7 @@ namespace ServerTests
 
 			await SendThroughSocketAsync(clientSocket1, makeMoveMsg, cts.Token);
 
-			await ReceiveFromSocketAsync<InvalidStateMessage>(clientSocket1,
-				timeoutMiliseconds);
+			await ReceiveFromSocketAsync<InvalidStateMessage>(clientSocket1);
 		}
 		[Test]
 		public async Task MakingCorrectMoveReturnsMoveResultMessageWithSuccessMessage()
@@ -145,9 +144,9 @@ namespace ServerTests
 			await SendThroughSocketAsync(clientSocket2, findMsg, cts.Token);
 
 			var gameFoundMsg1 = await ReceiveFromSocketAsync<GameFoundMessage>(
-				clientSocket1, timeoutMiliseconds);
+				clientSocket1);
 			var gameFoundMsg2 = await ReceiveFromSocketAsync<GameFoundMessage>(
-				clientSocket2, timeoutMiliseconds);
+				clientSocket2);
 
 			ClientWebSocket firstPlayerSocket, secondPlayerSocket;
 			if (gameFoundMsg1.IsClientTurn)
@@ -168,9 +167,9 @@ namespace ServerTests
 			{ X = x, Y = y }, cts.Token);
 
 			var moveResultMessage1 = await ReceiveFromSocketAsync<MoveResultMessage>(
-				firstPlayerSocket, timeoutMiliseconds);
+				firstPlayerSocket);
 			var moveResultMessage2 = await ReceiveFromSocketAsync<MoveResultMessage>(
-				secondPlayerSocket, timeoutMiliseconds);
+				secondPlayerSocket);
 
 			Assert.AreEqual(PlayResult.Success.ToString(), moveResultMessage1.Message);
 			Assert.AreEqual(PlayResult.Success.ToString(), moveResultMessage2.Message);
@@ -200,9 +199,9 @@ namespace ServerTests
 			await SendThroughSocketAsync(clientSocket2, findMsg, cts.Token);
 
 			var gameFoundMsg1 = await ReceiveFromSocketAsync<GameFoundMessage>(
-				clientSocket1, timeoutMiliseconds);
+				clientSocket1);
 			var gameFoundMsg2 = await ReceiveFromSocketAsync<GameFoundMessage>(
-				clientSocket2, timeoutMiliseconds);
+				clientSocket2);
 
 			ClientWebSocket firstPlayerSocket, secondPlayerSocket;
 			if (gameFoundMsg1.IsClientTurn)
@@ -220,10 +219,9 @@ namespace ServerTests
 			{ X = 1, Y = 2 }, cts.Token);
 
 			var moveResultMessage2 = await ReceiveFromSocketAsync<MoveResultMessage>(
-				secondPlayerSocket, timeoutMiliseconds);
+				secondPlayerSocket);
 			Assert.ThrowsAsync<TaskCanceledException>(async () =>
-				await ReceiveFromSocketAsync<MoveResultMessage>(firstPlayerSocket,
-				timeoutMiliseconds));
+				await ReceiveFromSocketAsync<MoveResultMessage>(firstPlayerSocket));
 
 			Assert.AreEqual(PlayResult.NotYourTurn.ToString(),
 				moveResultMessage2.Message);
@@ -250,9 +248,9 @@ namespace ServerTests
 			await SendThroughSocketAsync(clientSocket2, findMsg, cts.Token);
 
 			var gameFoundMsg1 = await ReceiveFromSocketAsync<GameFoundMessage>(
-				clientSocket1, timeoutMiliseconds);
+				clientSocket1);
 			var gameFoundMsg2 = await ReceiveFromSocketAsync<GameFoundMessage>(
-				clientSocket2, timeoutMiliseconds);
+				clientSocket2);
 
 			ClientWebSocket firstPlayerSocket, secondPlayerSocket;
 			if (gameFoundMsg1.IsClientTurn)
@@ -272,10 +270,8 @@ namespace ServerTests
 			await SendThroughSocketAsync(firstPlayerSocket, new MakeMoveMessage()
 			{ X = 0, Y = 0 }, cts.Token);
 
-			await ReceiveFromSocketAsync<MoveResultMessage>(firstPlayerSocket,
-				timeoutMiliseconds);
-			await ReceiveFromSocketAsync<MoveResultMessage>(secondPlayerSocket,
-				timeoutMiliseconds);
+			await ReceiveFromSocketAsync<MoveResultMessage>(firstPlayerSocket);
+			await ReceiveFromSocketAsync<MoveResultMessage>(secondPlayerSocket);
 
 			// X| | 
 			// O| | 
@@ -283,10 +279,8 @@ namespace ServerTests
 			await SendThroughSocketAsync(secondPlayerSocket, new MakeMoveMessage()
 			{ X = 0, Y = 1 }, cts.Token);
 
-			await ReceiveFromSocketAsync<MoveResultMessage>(firstPlayerSocket,
-				timeoutMiliseconds);
-			await ReceiveFromSocketAsync<MoveResultMessage>(secondPlayerSocket,
-				timeoutMiliseconds);
+			await ReceiveFromSocketAsync<MoveResultMessage>(firstPlayerSocket);
+			await ReceiveFromSocketAsync<MoveResultMessage>(secondPlayerSocket);
 
 			// X|X| 
 			// O| | 
@@ -294,10 +288,8 @@ namespace ServerTests
 			await SendThroughSocketAsync(firstPlayerSocket, new MakeMoveMessage()
 			{ X = 1, Y = 0 }, cts.Token);
 
-			await ReceiveFromSocketAsync<MoveResultMessage>(firstPlayerSocket,
-				timeoutMiliseconds);
-			await ReceiveFromSocketAsync<MoveResultMessage>(secondPlayerSocket,
-				timeoutMiliseconds);
+			await ReceiveFromSocketAsync<MoveResultMessage>(firstPlayerSocket);
+			await ReceiveFromSocketAsync<MoveResultMessage>(secondPlayerSocket);
 
 			// X|X| 
 			// O| | 
@@ -305,10 +297,8 @@ namespace ServerTests
 			await SendThroughSocketAsync(secondPlayerSocket, new MakeMoveMessage()
 			{ X = 0, Y = 2 }, cts.Token);
 
-			await ReceiveFromSocketAsync<MoveResultMessage>(firstPlayerSocket,
-				timeoutMiliseconds);
-			await ReceiveFromSocketAsync<MoveResultMessage>(secondPlayerSocket,
-				timeoutMiliseconds);
+			await ReceiveFromSocketAsync<MoveResultMessage>(firstPlayerSocket);
+			await ReceiveFromSocketAsync<MoveResultMessage>(secondPlayerSocket);
 
 			// X|X|X
 			// O| | 
@@ -317,9 +307,9 @@ namespace ServerTests
 			{ X = 2, Y = 0 }, cts.Token);
 
 			var msg1 = await ReceiveFromSocketAsync<MoveResultMessage>(
-				firstPlayerSocket, timeoutMiliseconds);
+				firstPlayerSocket);
 			var msg2 = await ReceiveFromSocketAsync<MoveResultMessage>(
-				secondPlayerSocket, timeoutMiliseconds);
+				secondPlayerSocket);
 
 			Assert.AreEqual(PlayResult.YouWin.ToString(), msg1.Message);
 			Assert.AreEqual(PlayResult.YouLose.ToString(), msg2.Message);
@@ -345,9 +335,9 @@ namespace ServerTests
 			await SendThroughSocketAsync(clientSocket2, findMsg, cts.Token);
 
 			var gameFoundMsg1 = await ReceiveFromSocketAsync<GameFoundMessage>(
-				clientSocket1, timeoutMiliseconds);
+				clientSocket1);
 			var gameFoundMsg2 = await ReceiveFromSocketAsync<GameFoundMessage>(
-				clientSocket2, timeoutMiliseconds);
+				clientSocket2);
 
 			ClientWebSocket firstPlayerSocket, secondPlayerSocket;
 			if (gameFoundMsg1.IsClientTurn)
@@ -367,10 +357,8 @@ namespace ServerTests
 			await SendThroughSocketAsync(firstPlayerSocket, new MakeMoveMessage()
 			{ X = 0, Y = 0 }, cts.Token);
 
-			await ReceiveFromSocketAsync<MoveResultMessage>(firstPlayerSocket,
-				timeoutMiliseconds);
-			await ReceiveFromSocketAsync<MoveResultMessage>(secondPlayerSocket,
-				timeoutMiliseconds);
+			await ReceiveFromSocketAsync<MoveResultMessage>(firstPlayerSocket);
+			await ReceiveFromSocketAsync<MoveResultMessage>(secondPlayerSocket);
 
 			// X| | 
 			// O| | 
@@ -378,10 +366,8 @@ namespace ServerTests
 			await SendThroughSocketAsync(secondPlayerSocket, new MakeMoveMessage()
 			{ X = 0, Y = 1 }, cts.Token);
 
-			await ReceiveFromSocketAsync<MoveResultMessage>(firstPlayerSocket,
-				timeoutMiliseconds);
-			await ReceiveFromSocketAsync<MoveResultMessage>(secondPlayerSocket,
-				timeoutMiliseconds);
+			await ReceiveFromSocketAsync<MoveResultMessage>(firstPlayerSocket);
+			await ReceiveFromSocketAsync<MoveResultMessage>(secondPlayerSocket);
 
 			// X| | 
 			// O| | 
@@ -389,10 +375,8 @@ namespace ServerTests
 			await SendThroughSocketAsync(firstPlayerSocket, new MakeMoveMessage()
 			{ X = 1, Y = 2 }, cts.Token);
 
-			await ReceiveFromSocketAsync<MoveResultMessage>(firstPlayerSocket,
-				timeoutMiliseconds);
-			await ReceiveFromSocketAsync<MoveResultMessage>(secondPlayerSocket,
-				timeoutMiliseconds);
+			await ReceiveFromSocketAsync<MoveResultMessage>(firstPlayerSocket);
+			await ReceiveFromSocketAsync<MoveResultMessage>(secondPlayerSocket);
 
 			// X|O| 
 			// O| | 
@@ -400,10 +384,8 @@ namespace ServerTests
 			await SendThroughSocketAsync(secondPlayerSocket, new MakeMoveMessage()
 			{ X = 1, Y = 0 }, cts.Token);
 
-			await ReceiveFromSocketAsync<MoveResultMessage>(firstPlayerSocket,
-				timeoutMiliseconds);
-			await ReceiveFromSocketAsync<MoveResultMessage>(secondPlayerSocket,
-				timeoutMiliseconds);
+			await ReceiveFromSocketAsync<MoveResultMessage>(firstPlayerSocket);
+			await ReceiveFromSocketAsync<MoveResultMessage>(secondPlayerSocket);
 
 			// X|O| 
 			// O| |X
@@ -411,10 +393,8 @@ namespace ServerTests
 			await SendThroughSocketAsync(firstPlayerSocket, new MakeMoveMessage()
 			{ X = 2, Y = 1 }, cts.Token);
 
-			await ReceiveFromSocketAsync<MoveResultMessage>(firstPlayerSocket,
-				timeoutMiliseconds);
-			await ReceiveFromSocketAsync<MoveResultMessage>(secondPlayerSocket,
-				timeoutMiliseconds);
+			await ReceiveFromSocketAsync<MoveResultMessage>(firstPlayerSocket);
+			await ReceiveFromSocketAsync<MoveResultMessage>(secondPlayerSocket);
 
 			// X|O| 
 			// O| |X
@@ -422,10 +402,8 @@ namespace ServerTests
 			await SendThroughSocketAsync(secondPlayerSocket, new MakeMoveMessage()
 			{ X = 2, Y = 2 }, cts.Token);
 
-			await ReceiveFromSocketAsync<MoveResultMessage>(firstPlayerSocket,
-				timeoutMiliseconds);
-			await ReceiveFromSocketAsync<MoveResultMessage>(secondPlayerSocket,
-				timeoutMiliseconds);
+			await ReceiveFromSocketAsync<MoveResultMessage>(firstPlayerSocket);
+			await ReceiveFromSocketAsync<MoveResultMessage>(secondPlayerSocket);
 
 			// X|O| 
 			// O|X|X
@@ -433,10 +411,8 @@ namespace ServerTests
 			await SendThroughSocketAsync(firstPlayerSocket, new MakeMoveMessage()
 			{ X = 1, Y = 1 }, cts.Token);
 
-			await ReceiveFromSocketAsync<MoveResultMessage>(firstPlayerSocket,
-				timeoutMiliseconds);
-			await ReceiveFromSocketAsync<MoveResultMessage>(secondPlayerSocket,
-				timeoutMiliseconds);
+			await ReceiveFromSocketAsync<MoveResultMessage>(firstPlayerSocket);
+			await ReceiveFromSocketAsync<MoveResultMessage>(secondPlayerSocket);
 
 			// X|O| 
 			// O|X|X
@@ -445,9 +421,9 @@ namespace ServerTests
 			{ X = 0, Y = 2 }, cts.Token);
 
 			var msg1 = await ReceiveFromSocketAsync<MoveResultMessage>(
-				firstPlayerSocket, timeoutMiliseconds);
+				firstPlayerSocket);
 			var msg2 = await ReceiveFromSocketAsync<MoveResultMessage>(
-				secondPlayerSocket, timeoutMiliseconds);
+				secondPlayerSocket);
 
 			Assert.AreEqual(PlayResult.Draw.ToString(), msg1.Message);
 			Assert.AreEqual(PlayResult.Draw.ToString(), msg2.Message);
@@ -475,19 +451,18 @@ namespace ServerTests
 
 			await SendThroughSocketAsync(clientSocket1, findMsg, cts.Token);
 			await SendThroughSocketAsync(clientSocket2, findMsg, cts.Token);
-			await Task.Delay(50);
 			await SendThroughSocketAsync(clientSocket3, findMsg, cts.Token);
 			await SendThroughSocketAsync(clientSocket4, findMsg, cts.Token);
 
 			var gameFoundMsg1 = await ReceiveFromSocketAsync<GameFoundMessage>(
-				clientSocket1, timeoutMiliseconds);
+				clientSocket1);
 			var gameFoundMsg2 = await ReceiveFromSocketAsync<GameFoundMessage>(
-				clientSocket2, timeoutMiliseconds);
+				clientSocket2);
 
 			var gameFoundMsg3 = await ReceiveFromSocketAsync<GameFoundMessage>(
-				clientSocket3, timeoutMiliseconds);
+				clientSocket3);
 			var gameFoundMsg4 = await ReceiveFromSocketAsync<GameFoundMessage>(
-				clientSocket4, timeoutMiliseconds);
+				clientSocket4);
 
 			Assert.AreNotEqual(gameFoundMsg1.IsClientTurn, gameFoundMsg2.IsClientTurn);
 			Assert.AreNotEqual(gameFoundMsg3.IsClientTurn, gameFoundMsg4.IsClientTurn);
@@ -522,9 +497,9 @@ namespace ServerTests
 				new MakeMoveMessage() { X = 2, Y = 2 }, cts.Token);
 
 			var moveResultMsg1 = await ReceiveFromSocketAsync<MoveResultMessage>(
-				firstPlayerSocketOfSecondSession, timeoutMiliseconds);
+				firstPlayerSocketOfSecondSession);
 			var moveResultMsg2 = await ReceiveFromSocketAsync<MoveResultMessage>(
-				secondPlayerSocketOfSecondSession, timeoutMiliseconds);
+				secondPlayerSocketOfSecondSession);
 
 			Assert.AreEqual(moveResultMsg1.X, 2);
 			Assert.AreEqual(moveResultMsg1.Y, 2);
@@ -535,9 +510,9 @@ namespace ServerTests
 				new MakeMoveMessage() { X = 1, Y = 1 }, cts.Token);
 
 			var moveResultMsg3 = await ReceiveFromSocketAsync<MoveResultMessage>(
-				firstPlayerSocketOfFirstSession, timeoutMiliseconds);
+				firstPlayerSocketOfFirstSession);
 			var moveResultMsg4 = await ReceiveFromSocketAsync<MoveResultMessage>(
-				secondPlayerSocketOfFirstSession, timeoutMiliseconds);
+				secondPlayerSocketOfFirstSession);
 
 			Assert.AreEqual(moveResultMsg3.X, 1);
 			Assert.AreEqual(moveResultMsg3.Y, 1);
@@ -551,7 +526,7 @@ namespace ServerTests
 			await clientSocket4.CloseAsync(status, "", cts.Token);
 		}
 
-		private async Task<T> ReceiveFromSocketAsync<T>(WebSocket socket, int timeout)
+		private async Task<T> ReceiveFromSocketAsync<T>(WebSocket socket)
 		{
 			var cts = new CancellationTokenSource();
 			var buffer = new byte[4000];
@@ -560,7 +535,7 @@ namespace ServerTests
 			int delayTime = 10;
 			while (!resultTask.IsCompleted)
 			{
-				if (counter * delayTime > timeout)
+				if (counter * delayTime > timeoutMiliseconds)
 				{
 					cts.Cancel();
 					break;
@@ -578,6 +553,7 @@ namespace ServerTests
 		{
 			var buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(msgObject));
 			await socket.SendAsync(buffer, WebSocketMessageType.Text, true, token);
+			await Task.Delay(5);
 		}
 	}
 }
