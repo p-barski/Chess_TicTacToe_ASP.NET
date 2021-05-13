@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Server.Sockets;
 using Server.Sockets.Other;
 using Server.Sockets.Handlers;
-using Server.TicTacToe;
+using Server.Games;
 
 namespace Server
 {

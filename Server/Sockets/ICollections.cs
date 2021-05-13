@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using Server.TicTacToe;
+using Server.Games;
 
 namespace Server.Sockets
 {

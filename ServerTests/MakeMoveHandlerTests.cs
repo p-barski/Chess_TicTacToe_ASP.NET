@@ -7,7 +7,7 @@ using Server.Sockets;
 using Server.Sockets.Other;
 using Server.Sockets.Messages;
 using Server.Sockets.Handlers;
-using Server.TicTacToe;
+using Server.Games;
 
 namespace ServerTests
 {

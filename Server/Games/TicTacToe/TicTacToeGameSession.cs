@@ -1,7 +1,7 @@
 using System;
 using TicTacToe;
 
-namespace Server.TicTacToe
+namespace Server.Games.TicTacToe
 {
 	public class TicTacToeGameSession : IGameSession
 	{

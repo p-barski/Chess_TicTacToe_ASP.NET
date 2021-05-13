@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
-using Server.TicTacToe;
+using Server.Games;
 using Server.Sockets.Other;
 using Server.Sockets.Messages;
 

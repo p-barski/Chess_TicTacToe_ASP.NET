@@ -7,7 +7,7 @@ using NUnit.Framework;
 using Moq;
 using Server.Sockets;
 using Server.Sockets.Handlers;
-using Server.TicTacToe;
+using Server.Games;
 
 namespace ServerTests
 {

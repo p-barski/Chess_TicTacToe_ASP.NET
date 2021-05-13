@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
-using Server.TicTacToe;
+using Server.Games;
 using Server.Sockets.Other;
 
 namespace Server.Sockets.Handlers

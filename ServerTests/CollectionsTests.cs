@@ -6,7 +6,7 @@ using Moq;
 using Server.Sockets;
 using Server.Sockets.Other;
 using Server.Sockets.Messages;
-using Server.TicTacToe;
+using Server.Games;
 
 namespace ServerTests
 {

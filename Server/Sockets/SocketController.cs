@@ -2,7 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Net.WebSockets;
 using Microsoft.Extensions.Logging;
-using Server.TicTacToe;
+using Server.Games;
 using Server.Sockets.Handlers;
 
 namespace Server.Sockets

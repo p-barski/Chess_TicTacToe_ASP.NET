@@ -1,4 +1,6 @@
-namespace Server.TicTacToe
+using Server.Games.TicTacToe;
+
+namespace Server.Games
 {
 	public class GameSessionFactory : IGameSessionFactory
 	{

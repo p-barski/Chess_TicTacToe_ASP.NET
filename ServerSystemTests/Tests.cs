@@ -8,7 +8,7 @@ using Microsoft.Extensions.Hosting;
 using NUnit.Framework;
 using Newtonsoft.Json;
 using Server;
-using Server.TicTacToe;
+using Server.Games;
 using Server.Sockets.Messages;
 
 namespace ServerTests

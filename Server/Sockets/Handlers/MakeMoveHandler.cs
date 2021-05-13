@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Server.TicTacToe;
+using Server.Games;
 using Server.Sockets.Other;
 using Server.Sockets.Messages;
 

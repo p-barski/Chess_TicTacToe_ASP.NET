@@ -2,7 +2,7 @@ using System;
 using Server.Sockets;
 using TicTacToe;
 
-namespace Server.TicTacToe
+namespace Server.Games
 {
 	public interface IPlayer
 	{

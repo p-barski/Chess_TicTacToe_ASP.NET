@@ -1,6 +1,6 @@
 using System;
 
-namespace Server.TicTacToe
+namespace Server.Games
 {
 	public interface IGameSession
 	{
