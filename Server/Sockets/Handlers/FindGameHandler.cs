@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Server.Games;
+using Server.Games.TicTacToe;
 using Server.Sockets.Other;
 using Server.Sockets.Messages;
 
@@ -32,7 +33,7 @@ namespace Server.Sockets.Handlers
 				collections.AddPlayer(player);
 			}
 
-			player.SetAsSearchingForGame(castedMessage.Size);
+			player.SetAsSearchingForGame(new ExpectedTicTacToe(castedMessage.Size));
 			try
 			{
 				var opponent = collections.FindPlayerSearchingForGame(player);

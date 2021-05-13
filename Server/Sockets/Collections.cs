@@ -57,7 +57,7 @@ namespace Server.Sockets
 			return players.First(player =>
 				player.Key.State == PlayerState.SearchingForGame &&
 				player.Key.GUID != excludedPlayer.GUID &&
-				player.Key.ExpectedBoardSize == excludedPlayer.ExpectedBoardSize).Key;
+				player.Key.ExpectedGame.Equals(excludedPlayer.ExpectedGame)).Key;
 		}
 		public IGameSession FindSessionOfAPlayer(IPlayer player)
 		{

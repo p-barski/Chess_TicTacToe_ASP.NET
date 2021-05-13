@@ -8,6 +8,7 @@ using Server.Sockets.Other;
 using Server.Sockets.Messages;
 using Server.Sockets.Handlers;
 using Server.Games;
+using Server.Games.TicTacToe;
 
 namespace ServerTests
 {
@@ -24,6 +25,7 @@ namespace ServerTests
 		public async Task WhenThereIsNoOpposingPlayer_MarkPlayerAsSearchingForGame()
 		{
 			int gameSize = 3;
+			var expectedGame = new ExpectedTicTacToe(gameSize);
 
 			var sessionFactoryMock = new Mock<IGameSessionFactory>(MockBehavior.Strict);
 			var playerMock = new Mock<IPlayer>(MockBehavior.Strict);
@@ -31,7 +33,7 @@ namespace ServerTests
 			playerMock.SetupGet(p => p.GameSessionGUID)
 				.Returns(Guid.Empty);
 			playerMock.Setup(p => p.SetAsSearchingForGame(
-				It.Is<int>(i => i == gameSize)));
+				It.Is<ExpectedTicTacToe>(e => e == expectedGame)));
 
 			collectionsMock.Setup(c => c.FindPlayerSearchingForGame(
 				It.Is<IPlayer>(p => p == playerMock.Object)))
@@ -44,7 +46,8 @@ namespace ServerTests
 			await handler.HandleMessageAsync(playerMock.Object,
 				new FindGameMessage() { Size = gameSize });
 
-			playerMock.Verify(p => p.SetAsSearchingForGame(It.Is<int>(i => i == gameSize)));
+			playerMock.Verify(p => p.SetAsSearchingForGame(
+				It.Is<ExpectedTicTacToe>(e => e == expectedGame)));
 			collectionsMock.Verify(c => c.FindPlayerSearchingForGame(
 				It.Is<IPlayer>(p => p == playerMock.Object)));
 		}
@@ -52,6 +55,7 @@ namespace ServerTests
 		public async Task WhenThereIsOpposingPlayer_CreateGameSession_AddItToCollections_AndSendMessageBackToPlayers()
 		{
 			int gameSize = 3;
+			var expectedGame = new ExpectedTicTacToe(gameSize);
 
 			var gameSessionMock = new Mock<IGameSession>(MockBehavior.Strict);
 			var sessionFactoryMock = new Mock<IGameSessionFactory>(MockBehavior.Strict);
@@ -65,7 +69,7 @@ namespace ServerTests
 			playerMock.SetupGet(p => p.Socket)
 				.Returns(playerSocketMock.Object);
 			playerMock.Setup(p => p.SetAsSearchingForGame(
-				It.Is<int>(i => i == gameSize)));
+				It.Is<ExpectedTicTacToe>(e => e == expectedGame)));
 
 			opponentMock.SetupGet(p => p.Socket)
 				.Returns(opponentSocketMock.Object);
@@ -93,7 +97,7 @@ namespace ServerTests
 				new FindGameMessage() { Size = gameSize });
 
 			playerMock.Verify(p => p.SetAsSearchingForGame(
-				It.Is<int>(i => i == gameSize)));
+				It.Is<ExpectedTicTacToe>(e => e == expectedGame)));
 
 			collectionsMock.Verify(c => c.FindPlayerSearchingForGame(
 				It.Is<IPlayer>(p => p == playerMock.Object)));
@@ -117,6 +121,7 @@ namespace ServerTests
 		public async Task WhenPlayerIsAlreadyConnectedToAGameSession_RemoveSessionAndMarkPlayerasSearchingForGame()
 		{
 			int gameSize = 3;
+			var expectedGame = new ExpectedTicTacToe(gameSize);
 
 			var gameSessionMock = new Mock<IGameSession>(MockBehavior.Strict);
 			var sessionFactoryMock = new Mock<IGameSessionFactory>(MockBehavior.Strict);
@@ -127,7 +132,7 @@ namespace ServerTests
 				.Returns(Guid.NewGuid());
 			playerMock.SetupGet(p => p.Socket).Returns(playerSocketMock.Object);
 			playerMock.Setup(p => p.SetAsSearchingForGame(
-				It.Is<int>(i => i == gameSize)));
+				It.Is<ExpectedTicTacToe>(e => e == expectedGame)));
 
 			collectionsMock.Setup(c => c.FindPlayerSearchingForGame(
 				It.Is<IPlayer>(p => p == playerMock.Object)))
@@ -143,7 +148,8 @@ namespace ServerTests
 			await handler.HandleMessageAsync(playerMock.Object,
 				new FindGameMessage() { Size = gameSize });
 
-			playerMock.Verify(p => p.SetAsSearchingForGame(It.Is<int>(i => i == gameSize)));
+			playerMock.Verify(p => p.SetAsSearchingForGame(
+				It.Is<ExpectedTicTacToe>(e => e == expectedGame)));
 			collectionsMock.Verify(c => c.FindPlayerSearchingForGame(
 				It.Is<IPlayer>(p => p == playerMock.Object)));
 			collectionsMock.Verify(c => c.RemovePlayer(

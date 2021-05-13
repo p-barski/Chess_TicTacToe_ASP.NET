@@ -7,6 +7,7 @@ using Server.Sockets;
 using Server.Sockets.Other;
 using Server.Sockets.Messages;
 using Server.Games;
+using Server.Games.TicTacToe;
 
 namespace ServerTests
 {
@@ -70,11 +71,11 @@ namespace ServerTests
 
 			player1Mock.SetupGet(p => p.GUID).Returns(player1Guid);
 			player1Mock.SetupGet(p => p.State).Returns(PlayerState.SearchingForGame);
-			player1Mock.SetupGet(p => p.ExpectedBoardSize).Returns(5);
+			player1Mock.SetupGet(p => p.ExpectedGame).Returns(new ExpectedTicTacToe(5));
 
 			player2Mock.SetupGet(p => p.GUID).Returns(player2Guid);
 			player2Mock.SetupGet(p => p.State).Returns(PlayerState.SearchingForGame);
-			player2Mock.SetupGet(p => p.ExpectedBoardSize).Returns(5);
+			player2Mock.SetupGet(p => p.ExpectedGame).Returns(new ExpectedTicTacToe(5));
 
 			var collections = new Collections(loggerMock.Object, msgSenderMock.Object);
 
@@ -100,19 +101,19 @@ namespace ServerTests
 
 			player1Mock.SetupGet(p => p.GUID).Returns(player1Guid);
 			player1Mock.SetupGet(p => p.State).Returns(PlayerState.SearchingForGame);
-			player1Mock.SetupGet(p => p.ExpectedBoardSize).Returns(5);
+			player1Mock.SetupGet(p => p.ExpectedGame).Returns(new ExpectedTicTacToe(5));
 
 			player2Mock.SetupGet(p => p.GUID).Returns(player2Guid);
 			player2Mock.SetupGet(p => p.State).Returns(PlayerState.Playing);
-			player2Mock.SetupGet(p => p.ExpectedBoardSize).Returns(5);
+			player2Mock.SetupGet(p => p.ExpectedGame).Returns(new ExpectedTicTacToe(5));
 
 			player3Mock.SetupGet(p => p.GUID).Returns(player3Guid);
 			player3Mock.SetupGet(p => p.State).Returns(PlayerState.Playing);
-			player3Mock.SetupGet(p => p.ExpectedBoardSize).Returns(5);
+			player3Mock.SetupGet(p => p.ExpectedGame).Returns(new ExpectedTicTacToe(5));
 
 			player4Mock.SetupGet(p => p.GUID).Returns(player4Guid);
 			player4Mock.SetupGet(p => p.State).Returns(PlayerState.Idle);
-			player4Mock.SetupGet(p => p.ExpectedBoardSize).Returns(5);
+			player4Mock.SetupGet(p => p.ExpectedGame).Returns(new ExpectedTicTacToe(5));
 
 			var collections = new Collections(loggerMock.Object, msgSenderMock.Object);
 
