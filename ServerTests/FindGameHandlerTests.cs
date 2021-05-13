@@ -75,7 +75,7 @@ namespace ServerTests
 				.Returns(opponentSocketMock.Object);
 
 			sessionFactoryMock.Setup(f => f.Create(
-				It.IsAny<IPlayer>(), It.IsAny<IPlayer>(), It.IsAny<int>()))
+				It.IsAny<IPlayer>(), It.IsAny<IPlayer>(), It.IsAny<IExpectedGame>()))
 				.Returns(gameSessionMock.Object);
 
 			collectionsMock.Setup(c => c.AddSession(It.Is<IGameSession>(
@@ -115,7 +115,7 @@ namespace ServerTests
 			sessionFactoryMock.Verify(f => f.Create(
 				It.Is<IPlayer>(p1 => p1 == playerMock.Object),
 				It.Is<IPlayer>(p2 => p2 == opponentMock.Object),
-				It.Is<int>(i => i == gameSize)));
+				It.Is<IExpectedGame>(e => e.Equals(expectedGame))));
 		}
 		[Test]
 		public async Task WhenPlayerIsAlreadyConnectedToAGameSession_RemoveSessionAndMarkPlayerasSearchingForGame()

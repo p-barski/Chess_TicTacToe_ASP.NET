@@ -33,11 +33,12 @@ namespace Server.Sockets.Handlers
 				collections.AddPlayer(player);
 			}
 
-			player.SetAsSearchingForGame(new ExpectedTicTacToe(castedMessage.Size));
+			var expectedGame = new ExpectedTicTacToe(castedMessage.Size);
+			player.SetAsSearchingForGame(expectedGame);
 			try
 			{
 				var opponent = collections.FindPlayerSearchingForGame(player);
-				var session = sessionFactory.Create(player, opponent, castedMessage.Size);
+				var session = sessionFactory.Create(player, opponent, expectedGame);
 				collections.AddSession(session);
 				logger.LogInformation("Created new game session.");
 				await messageSender.SendMessageAsync(player.Socket, new GameFoundMessage(true));
