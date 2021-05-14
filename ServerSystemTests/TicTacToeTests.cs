@@ -13,7 +13,7 @@ using Server.Sockets.Messages;
 
 namespace ServerTests
 {
-	public class Tests
+	public class TicTacToeTests
 	{
 		private IHost host;
 		private Thread serverThread;
