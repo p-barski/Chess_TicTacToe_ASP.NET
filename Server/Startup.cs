@@ -8,6 +8,7 @@ using Server.Sockets;
 using Server.Sockets.Other;
 using Server.Sockets.Handlers;
 using Server.Games;
+using Chess;
 
 namespace Server
 {
@@ -15,11 +16,14 @@ namespace Server
 	{
 		public void ConfigureServices(IServiceCollection services)
 		{
+			services.AddSingleton<IChessGameFactory, ChessGameFactory>();
 			services.AddSingleton<IGameSessionFactory, GameSessionFactory>();
 			services.AddSingleton<ICollections, Collections>();
 			services.AddSingleton<IMessageDeserializer, MessageDeserializer>();
 			services.AddSingleton<IMessageSender, MessageSender>();
 			services.AddSingleton<IMessageHandler, FindGameHandler>();
+			services.AddSingleton<IMessageHandler, FindChessGameHandler>();
+			services.AddSingleton<IMessageHandler, MakeChessMoveHandler>();
 			services.AddSingleton<IMessageHandler, MakeMoveHandler>();
 			services.AddSingleton<ISocketMessageHandler, SocketMessageHandler>();
 			services.AddSingleton<SocketController>();

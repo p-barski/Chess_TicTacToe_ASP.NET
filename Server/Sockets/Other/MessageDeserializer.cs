@@ -23,6 +23,21 @@ namespace Server.Sockets.Other
 				return JsonConvert.DeserializeObject<MakeMoveMessage>(json, jsonSettings);
 			}
 			catch (JsonException) { }
+			try
+			{
+				return JsonConvert.DeserializeObject<FindChessGameMessage>(json, jsonSettings);
+			}
+			catch (JsonException) { }
+			try
+			{
+				return JsonConvert.DeserializeObject<MakeChessMoveMessage>(json, jsonSettings);
+			}
+			catch (JsonException) { }
+			try
+			{
+				return JsonConvert.DeserializeObject<PawnPromotionMessage>(json, jsonSettings);
+			}
+			catch (JsonException) { }
 			return new IncorrectMessage() { Json = json };
 		}
 		public byte[] SerializeToBuffer<T>(T message)
