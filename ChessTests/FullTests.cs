@@ -11,6 +11,23 @@ namespace ChessTests
 	public class FullTests
 	{
 		[Test]
+		public void ThereShouldBe20StartingMoves()
+		{
+			var factory = new ChessGameFactory();
+			var game = factory.Create();
+			var moves = game.GetAvailableLegalMoves(ChessColor.White).ToList();
+			Assert.AreEqual(20, moves.Count);
+		}
+		[Test]
+		public void ThereShouldBe20FirstBlackMoves()
+		{
+			var factory = new ChessGameFactory();
+			var game = factory.Create();
+			game.Play(new ChessMove(new Position(0, 1), new Position(0, 2)), ChessColor.White);
+			var moves = game.GetAvailableLegalMoves(ChessColor.Black).ToList();
+			Assert.AreEqual(20, moves.Count);
+		}
+		[Test]
 		public void QuickestWhiteWinTest()
 		{
 			var moves = new List<ChessMove>(){

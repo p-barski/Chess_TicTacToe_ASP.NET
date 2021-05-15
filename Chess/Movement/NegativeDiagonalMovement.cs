@@ -39,7 +39,7 @@ namespace Chess.Movement
 			var positions = new List<Position>();
 			int x = chessPiece.Position.X - 1;
 			int y = chessPiece.Position.Y + 1;
-			for (; x >= 0 && y >= 0; x--, y++)
+			for (; x >= 0 && y < boardSize; x--, y++)
 			{
 				var position = new Position(x, y);
 				if (AddPositionToList(chessPiece, position, positions))
@@ -54,7 +54,7 @@ namespace Chess.Movement
 			var positions = new List<Position>();
 			int x = chessPiece.Position.X + 1;
 			int y = chessPiece.Position.Y - 1;
-			for (; x < boardSize && y < boardSize; x++, y--)
+			for (; x < boardSize && y >= 0; x++, y--)
 			{
 				var position = new Position(x, y);
 				if (AddPositionToList(chessPiece, position, positions))

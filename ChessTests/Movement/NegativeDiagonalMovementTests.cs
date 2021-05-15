@@ -76,7 +76,6 @@ namespace ChessTests
 			Assert.Contains(availableFinishPosition06, finishedPositions);
 			Assert.Contains(availableFinishPosition07, finishedPositions);
 		}
-
 		[Test]
 		public void QueenCanCaptureEnemiesButCantJumpThroughThem()
 		{
@@ -207,6 +206,112 @@ namespace ChessTests
 				.ToList();
 
 			Assert.Contains(availableFinishPosition, finishedPositions);
+		}
+		[Test]
+		public void WhiteBishopCantMoveOutsideOfBoard()
+		{
+			//WB - white bishop
+			//WP - white pawn
+			//7                        
+			//6                        
+			//5                        
+			//4                        
+			//3                        
+			//2                        
+			//1    WP    WP            
+			//0       WB               
+			//  0  1  2  3  4  5  6  7 
+			var boardMock = new Mock<IChessBoard>(MockBehavior.Strict);
+			var bishopMock = new Mock<IReadOnlyChessPiece>(MockBehavior.Strict);
+
+			var bishopPosition = new Position(2, 0);
+
+			var pawn1Position = new Position(1, 1);
+			var pawn2Position = new Position(3, 1);
+
+			bishopMock
+				.SetupGet(p => p.Color)
+				.Returns(ChessColor.White);
+			bishopMock
+				.SetupGet(p => p.PieceType)
+				.Returns(ChessPieceType.Bishop);
+			bishopMock
+				.SetupGet(p => p.Position)
+				.Returns(bishopPosition);
+			bishopMock
+				.SetupGet(p => p.HasMoved)
+				.Returns(false);
+
+			boardMock
+				.Setup(b => b.IsPositionTaken(pawn1Position))
+				.Returns(true);
+			boardMock
+				.Setup(b => b.IsPositionTaken(pawn2Position))
+				.Returns(true);
+			boardMock
+				.Setup(b => b.IsEnemyOnPosition(pawn1Position, ChessColor.Black))
+				.Returns(false);
+			boardMock
+				.Setup(b => b.IsEnemyOnPosition(pawn2Position, ChessColor.Black))
+				.Returns(false);
+
+			var movement = new NegativeDiagonalMovement(boardMock.Object);
+			var availableMoves = movement.GetAvailableMoves(bishopMock.Object);
+
+			Assert.AreEqual(0, availableMoves.Count());
+		}
+		[Test]
+		public void BlackBishopCantMoveOutsideOfBoard()
+		{
+			//BB - black bishop
+			//BP - black pawn
+			//7       BB               
+			//6    BP    BP            
+			//5                        
+			//4                        
+			//3                        
+			//2                        
+			//1                        
+			//0                        
+			//  0  1  2  3  4  5  6  7 
+			var boardMock = new Mock<IChessBoard>(MockBehavior.Strict);
+			var bishopMock = new Mock<IReadOnlyChessPiece>(MockBehavior.Strict);
+
+			var bishopPosition = new Position(2, 7);
+
+			var pawn1Position = new Position(1, 6);
+			var pawn2Position = new Position(3, 6);
+
+			bishopMock
+				.SetupGet(p => p.Color)
+				.Returns(ChessColor.Black);
+			bishopMock
+				.SetupGet(p => p.PieceType)
+				.Returns(ChessPieceType.Bishop);
+			bishopMock
+				.SetupGet(p => p.Position)
+				.Returns(bishopPosition);
+			bishopMock
+				.SetupGet(p => p.HasMoved)
+				.Returns(false);
+
+			boardMock
+				.Setup(b => b.IsPositionTaken(pawn1Position))
+				.Returns(true);
+			boardMock
+				.Setup(b => b.IsPositionTaken(pawn2Position))
+				.Returns(true);
+			boardMock
+				.Setup(b => b.IsEnemyOnPosition(pawn1Position, ChessColor.White))
+				.Returns(false);
+			boardMock
+				.Setup(b => b.IsEnemyOnPosition(pawn2Position, ChessColor.White))
+				.Returns(false);
+
+			var movement = new NegativeDiagonalMovement(boardMock.Object);
+			var availableMoves = movement.GetAvailableMoves(bishopMock.Object);
+
+			Assert.AreEqual(0, availableMoves.Count());
 		}
 	}
 }
