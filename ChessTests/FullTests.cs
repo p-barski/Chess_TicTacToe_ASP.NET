@@ -229,5 +229,38 @@ namespace ChessTests
 
 			Assert.AreEqual(ChessPlayResult.InvalidMove, result);
 		}
+		[Test]
+		public void KingCanCaptureOtherPieces()
+		{
+			var moves = new List<ChessMove>(){
+				//white pawn two up
+				new ChessMove(new Position(5, 1), new Position(5, 3)),
+				//black pawn two down
+				new ChessMove(new Position(3, 6), new Position(3, 4)),
+				//white king up right
+				new ChessMove(new Position(4, 0), new Position(5, 1)),
+				//left black bishop move
+				new ChessMove(new Position(2, 7), new Position(6, 3)),
+				//white king up right
+				new ChessMove(new Position(5, 1), new Position(6, 2)),
+				//black pawn one down
+				new ChessMove(new Position(3, 4), new Position(3, 3)),
+				//white king capturing bishop
+				new ChessMove(new Position(6, 2), new Position(6, 3)),
+			};
+
+			var factory = new ChessGameFactory();
+			var game = factory.Create();
+
+			ChessPlayResult result = ChessPlayResult.SuccessfulMove;
+			foreach (var move in moves)
+			{
+				Assert.AreEqual(ChessPlayResult.SuccessfulMove, result);
+				result = game.Play(move, game.CurrentPlayer);
+			}
+
+			Assert.AreEqual(ChessPlayResult.SuccessfulMove, result);
+			Assert.AreEqual(31, game.Pieces.Count());
+		}
 	}
 }

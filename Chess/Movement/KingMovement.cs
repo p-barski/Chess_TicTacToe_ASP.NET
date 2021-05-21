@@ -28,7 +28,7 @@ namespace Chess.Movement
 				var isEnemyPresent = chessBoard.IsEnemyOnPosition(position, chessPiece.Color.Opposite());
 				if (isEnemyPresent)
 				{
-					availableMoves.Add(new ChessMove(chessPiece.Position, position, true));
+					availableMoves.Add(new ChessMove(chessPiece.Position, position));
 					continue;
 				}
 				var isPositionTaken = chessBoard.IsPositionTaken(position);
