@@ -19,14 +19,14 @@ namespace ServerTests
 		private IHost host;
 		private Thread serverThread;
 		private Uri serverUrl = new Uri("ws://localhost:5000");
-		private int timeoutMiliseconds = 100;
+		private int timeoutMiliseconds = 500;
 		[SetUp]
 		public async Task Setup()
 		{
 			host = Program.CreateHostBuilder(new string[0]).Build();
 			serverThread = new Thread(() => host.Start());
 			serverThread.Start();
-			await Task.Delay(50);
+			await Task.Delay(1000);
 		}
 		[TearDown]
 		public async Task TearDown()

@@ -1,5 +1,6 @@
 using System;
 using Server.Sockets;
+using Server.Database;
 
 namespace Server.Games
 {
@@ -7,6 +8,7 @@ namespace Server.Games
 	{
 		Guid GUID { get; }
 		IWebSocket Socket { get; }
+		PlayerData PlayerData { get; set; }
 		IPlayerType PlayerType { get; }
 		IExpectedGame ExpectedGame { get; }
 		PlayerState State { get; }

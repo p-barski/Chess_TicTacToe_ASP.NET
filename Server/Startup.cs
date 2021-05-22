@@ -8,6 +8,8 @@ using Server.Sockets;
 using Server.Sockets.Other;
 using Server.Sockets.Handlers;
 using Server.Games;
+using Server.Database;
+using Server.Database.Chess;
 using Chess;
 
 namespace Server
@@ -16,6 +18,13 @@ namespace Server
 	{
 		public void ConfigureServices(IServiceCollection services)
 		{
+			var connectionString = EnvironmentVariableGetter.GetConnectionStringEnvironmentVar();
+			var usePostgres = EnvironmentVariableGetter.GetWhetherToUsePostgresEnvironmentVar();
+			var databaseAccess = new DatabaseAccess(connectionString, usePostgres);
+
+			services.AddSingleton<IChessDatabase>(databaseAccess);
+			services.AddSingleton<IPlayerDataDatabase>(databaseAccess);
+			services.AddSingleton<IChessMovementHistoryConverter, ChessMovementHistoryConverter>();
 			services.AddSingleton<IChessGameFactory, ChessGameFactory>();
 			services.AddSingleton<IGameSessionFactory, GameSessionFactory>();
 			services.AddSingleton<ICollections, Collections>();

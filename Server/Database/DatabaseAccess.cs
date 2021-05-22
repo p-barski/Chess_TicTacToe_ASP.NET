@@ -7,6 +7,9 @@ namespace Server.Database
 {
 	public class DatabaseAccess : IChessDatabase, IPlayerDataDatabase
 	{
+		public PlayerData PlayerDataForNotLoggedInPlayers { get; }
+		private const string defaultName = "Anonymous";
+		private const string defaultPassword = "";
 		private readonly string connectionString;
 		private readonly bool usePostgres;
 		public DatabaseAccess(string connectionString, bool usePostgres = false)
@@ -15,6 +18,7 @@ namespace Server.Database
 			this.usePostgres = usePostgres;
 			using var context = new GamesDbContext(connectionString, usePostgres);
 			context.Database.EnsureCreated();
+			PlayerDataForNotLoggedInPlayers = GetOrCreatePlayerDataForNotLoggedInPlayers(context);
 		}
 		public IEnumerable<ChessGameDb> GetAllSavedGames()
 		{
@@ -34,25 +38,6 @@ namespace Server.Database
 			await context.AddAsync(chessGame);
 			await context.SaveChangesAsync();
 		}
-		public async Task<PlayerData> GetPlayerDataForNotLoggedInPlayers()
-		{
-			string name = "Anonymous";
-			string password = "";
-
-			using var context = new GamesDbContext(connectionString, usePostgres);
-			var playerData = context.PlayerDatas
-				.First(u => u.Name == name && u.Password == password);
-
-			if (playerData != null)
-			{
-				return playerData;
-			}
-
-			playerData = new PlayerData(name, password);
-			await context.AddAsync(playerData);
-			await context.SaveChangesAsync();
-			return playerData;
-		}
 		public PlayerData GetPlayerData(string name, string password)
 		{
 			using var context = new GamesDbContext(connectionString, usePostgres);
@@ -64,6 +49,20 @@ namespace Server.Database
 			using var context = new GamesDbContext(connectionString, usePostgres);
 			await context.AddAsync(playerData);
 			await context.SaveChangesAsync();
+		}
+		private PlayerData GetOrCreatePlayerDataForNotLoggedInPlayers(GamesDbContext context)
+		{
+			var playerData = context.PlayerDatas
+				.FirstOrDefault(u => u.Name == defaultName && u.Password == defaultPassword);
+			if (playerData != null)
+			{
+				return playerData;
+			}
+
+			playerData = new PlayerData(defaultName, defaultPassword);
+			context.Add(playerData);
+			context.SaveChanges();
+			return playerData;
 		}
 	}
 }

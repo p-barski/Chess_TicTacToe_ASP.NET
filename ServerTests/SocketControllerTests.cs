@@ -8,6 +8,7 @@ using Moq;
 using Server.Sockets;
 using Server.Sockets.Handlers;
 using Server.Games;
+using Server.Database;
 
 namespace ServerTests
 {
@@ -19,13 +20,17 @@ namespace ServerTests
 			new Mock<ICollections>(MockBehavior.Strict);
 		private readonly Mock<ISocketMessageHandler> msgHandlerMock =
 			new Mock<ISocketMessageHandler>(MockBehavior.Strict);
-
+		private readonly Mock<IPlayerDataDatabase> databaseAcessMock =
+			new Mock<IPlayerDataDatabase>(MockBehavior.Strict);
 		[Test]
 		public async Task WhenSocketConnectionTerminates_PlayerShouldBeRemovedFromCollections()
 		{
 			collectionsMock.Setup(c => c.AddPlayer(It.IsAny<IPlayer>()));
 			collectionsMock.Setup(c => c.RemovePlayer(It.IsAny<IPlayer>()))
 				.Returns(() => Task.Delay(0));
+			databaseAcessMock
+				.SetupGet(d => d.PlayerDataForNotLoggedInPlayers)
+				.Returns(new PlayerData("mock", "test"));
 
 			var socketMock = new Mock<IWebSocket>(MockBehavior.Strict);
 			socketMock.SetupGet(s => s.State).Returns(WebSocketState.Open);
@@ -34,7 +39,8 @@ namespace ServerTests
 				.Returns(() => throw new WebSocketException());
 
 			var controller = new SocketController(loggerMock.Object,
-				collectionsMock.Object, msgHandlerMock.Object);
+				collectionsMock.Object, msgHandlerMock.Object,
+				databaseAcessMock.Object);
 
 			await controller.ReceiveAsync(socketMock.Object);
 

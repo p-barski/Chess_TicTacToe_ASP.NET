@@ -12,6 +12,7 @@ namespace ServerDatabaseTests
 {
 	public class DbTests
 	{
+		const string connectionString = "Data Source=tests.db;";
 		[Test]
 		public async Task TestSavingChessGame()
 		{
@@ -27,13 +28,13 @@ namespace ServerDatabaseTests
 			var chessGame = new ChessGameDb(chessMoves, whitePlayer, blackPlayer,
 				startDate, finishDate, "Stalemate");
 
-			var databaseAccess = new DatabaseAccess("Data Source=tests.db;");
+			var databaseAccess = new DatabaseAccess(connectionString);
 			await databaseAccess.SaveGameAsync(chessGame);
 		}
 		[Test]
 		public async Task TestSavingPlayerData()
 		{
-			var databaseAccess = new DatabaseAccess("Data Source=tests.db;");
+			var databaseAccess = new DatabaseAccess(connectionString);
 			byte[] salt;
 			new RNGCryptoServiceProvider().GetBytes(salt = new byte[16]);
 			var pbkdf2 = new Rfc2898DeriveBytes("hello", salt, 100000);
@@ -48,11 +49,19 @@ namespace ServerDatabaseTests
 		[Test]
 		public void TestReading()
 		{
-			var databaseAccess = new DatabaseAccess("Data Source=tests.db;");
+			var databaseAccess = new DatabaseAccess(connectionString);
 			var games = databaseAccess.GetAllSavedGames();
 			games
 				.ToList()
 				.ForEach(g => Assert.IsTrue(g.ChessMoves != null));
+		}
+		[Test]
+		public void TestGettingPlayerDataForNotLoggedInPlayers()
+		{
+			var databaseAccess = new DatabaseAccess(connectionString);
+			var playerData = databaseAccess.PlayerDataForNotLoggedInPlayers;
+			Assert.AreEqual("Anonymous", playerData.Name);
+			Assert.AreEqual("", playerData.Password);
 		}
 	}
 }
