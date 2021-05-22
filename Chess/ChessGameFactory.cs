@@ -21,6 +21,7 @@ namespace Chess
 
 			List<IMovement> movements = new();
 			var pawnMovement = new PawnMovement(chessBoard);
+			var enPassantMovement = new EnPassantMovement(chessBoard);
 			var kingMovement = new KingMovement(chessBoard);
 			var horizontalMovement = new HorizontalMovement(chessBoard);
 			var verticalMovement = new VerticalMovement(chessBoard);
@@ -28,6 +29,7 @@ namespace Chess
 			var ndiagonalMovement = new NegativeDiagonalMovement(chessBoard);
 			var knightMovement = new KnightMovement(chessBoard);
 			movements.Add(pawnMovement);
+			movements.Add(enPassantMovement);
 			movements.Add(kingMovement);
 			movements.Add(horizontalMovement);
 			movements.Add(verticalMovement);

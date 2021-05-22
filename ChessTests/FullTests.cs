@@ -262,5 +262,34 @@ namespace ChessTests
 			Assert.AreEqual(ChessPlayResult.SuccessfulMove, result);
 			Assert.AreEqual(31, game.Pieces.Count());
 		}
+		[Test]
+		public void PawnCanPerformEnPassant()
+		{
+			var moves = new List<ChessMove>(){
+				//white pawn two up
+				new ChessMove(new Position(6, 1), new Position(6, 3)),
+				//black pawn two down
+				new ChessMove(new Position(7, 6), new Position(7, 4)),
+				//white pawn captures black pawn
+				new ChessMove(new Position(6, 3), new Position(7, 4)),
+				//black pawn two down
+				new ChessMove(new Position(6, 6), new Position(6, 4)),
+				//white pawn performs en passant
+				new ChessMove(new Position(7, 4), new Position(6, 5)),
+			};
+
+			var factory = new ChessGameFactory();
+			var game = factory.Create();
+
+			ChessPlayResult result = ChessPlayResult.SuccessfulMove;
+			foreach (var move in moves)
+			{
+				Assert.AreEqual(ChessPlayResult.SuccessfulMove, result);
+				result = game.Play(move, game.CurrentPlayer);
+			}
+
+			Assert.AreEqual(ChessPlayResult.SuccessfulMove, result);
+			Assert.AreEqual(30, game.Pieces.Count());
+		}
 	}
 }
