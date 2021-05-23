@@ -63,5 +63,21 @@ namespace ServerDatabaseTests
 			Assert.AreEqual("Anonymous", playerData.Name);
 			Assert.AreEqual("", playerData.Password);
 		}
+		[Test]
+		public void TestNpgsqlUrlParser()
+		{
+			var host = "localhost";
+			var port = "5000";
+			var username = "name";
+			var password = "password1";
+			var database = "testdb";
+			var efCoreConnectionString =
+				$"Host={host};Port={port};Username={username};Password={password};Database={database}";
+
+			var databaseUrl = $"postgres://{username}:{password}@{host}:{port}/{database}";
+			var connectionString = NpgsqlUrlParser.ParseToEFCoreConnectionString(databaseUrl);
+
+			Assert.AreEqual(efCoreConnectionString, connectionString);
+		}
 	}
 }

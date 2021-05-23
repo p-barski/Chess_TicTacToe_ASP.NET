@@ -20,6 +20,10 @@ namespace Server
 		{
 			var connectionString = EnvironmentVariableGetter.GetConnectionStringEnvironmentVar();
 			var usePostgres = EnvironmentVariableGetter.GetWhetherToUsePostgresEnvironmentVar();
+			if (usePostgres)
+			{
+				connectionString = NpgsqlUrlParser.ParseToEFCoreConnectionString(connectionString);
+			}
 			var databaseAccess = new DatabaseAccess(connectionString, usePostgres);
 
 			services.AddSingleton<IChessDatabase>(databaseAccess);
