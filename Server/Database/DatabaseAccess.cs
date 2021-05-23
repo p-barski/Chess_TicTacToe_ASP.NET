@@ -35,6 +35,8 @@ namespace Server.Database
 		public async Task SaveGameAsync(ChessGameDb chessGame)
 		{
 			using var context = new GamesDbContext(connectionString, usePostgres);
+			context.PlayerDatas.Attach(chessGame.WhitePlayer);
+			context.PlayerDatas.Attach(chessGame.BlackPlayer);
 			await context.AddAsync(chessGame);
 			await context.SaveChangesAsync();
 		}

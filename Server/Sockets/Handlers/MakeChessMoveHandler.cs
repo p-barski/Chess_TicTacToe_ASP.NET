@@ -5,20 +5,24 @@ using Server.Games;
 using Server.Games.Chess;
 using Server.Sockets.Other;
 using Server.Sockets.Messages;
+using Server.Database;
+using Server.Database.Chess;
 
 namespace Server.Sockets.Handlers
 {
 	public class MakeChessMoveHandler : IMessageHandler
 	{
 		private readonly ICollections collections;
-		private readonly ILogger<MakeChessMoveHandler> logger;
 		private readonly IMessageSender messageSender;
-		public MakeChessMoveHandler(ICollections collections,
-			ILogger<MakeChessMoveHandler> logger, IMessageSender messageSender)
+		private readonly IChessMovementHistoryConverter converter;
+		private readonly IChessDatabase databaseAccess;
+		public MakeChessMoveHandler(ICollections collections, IMessageSender messageSender,
+			IChessMovementHistoryConverter converter, IChessDatabase databaseAccess)
 		{
 			this.collections = collections;
-			this.logger = logger;
 			this.messageSender = messageSender;
+			this.converter = converter;
+			this.databaseAccess = databaseAccess;
 		}
 		public async Task HandleMessageAsync(IPlayer player, IReceivedMessage msg)
 		{
@@ -108,8 +112,14 @@ namespace Server.Sockets.Handlers
 
 			await messageSender.SendMessageAsync(winner.Socket, msgToWinner);
 			await messageSender.SendMessageAsync(loser.Socket, msgToLoser);
-
 			await SendChessPiecesAndMovesMessageAsync(session);
+
+			if (IsWhitePlayer(session, winner))
+			{
+				await SaveGameHistory(session, "WhiteWin");
+				return;
+			}
+			await SaveGameHistory(session, "BlackWin");
 		}
 		private async Task SendStalemateAsync(ChessGameSession session)
 		{
@@ -117,6 +127,7 @@ namespace Server.Sockets.Handlers
 			{
 				Message = PlayResult.Draw.ToString()
 			};
+			await SaveGameHistory(session, "Stalemate");
 
 			await messageSender.SendMessageAsync(session.PlayerOne.Socket, stalemateMsg);
 			await messageSender.SendMessageAsync(session.PlayerTwo.Socket, stalemateMsg);
@@ -151,6 +162,17 @@ namespace Server.Sockets.Handlers
 				return session.PlayerTwo;
 			}
 			return session.PlayerOne;
+		}
+		private bool IsWhitePlayer(IGameSession session, IPlayer player)
+		{
+			return session.PlayerOne == player;
+		}
+		private async Task SaveGameHistory(ChessGameSession session, string result)
+		{
+			var gameDb = converter.ConvertToDb(session.MovementHistory,
+				session.PlayerOne.PlayerData, session.PlayerTwo.PlayerData,
+				session.StartDate, DateTime.UtcNow, result);
+			await databaseAccess.SaveGameAsync(gameDb);
 		}
 	}
 }

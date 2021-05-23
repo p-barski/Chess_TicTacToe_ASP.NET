@@ -13,6 +13,8 @@ namespace Server.Games.Chess
 		public Guid GUID { get; } = Guid.NewGuid();
 		public IPlayer PlayerOne { get; }
 		public IPlayer PlayerTwo { get; }
+		public DateTime StartDate { get; } = DateTime.UtcNow;
+		public IReadOnlyMovementHistory MovementHistory { get => game.MovementHistory; }
 		private IChessGame game;
 		public ChessGameSession(IPlayer playerOne, IPlayer playerTwo,
 			IChessGameFactory chessGameFactory)

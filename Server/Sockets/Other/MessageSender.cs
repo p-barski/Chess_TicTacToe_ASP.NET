@@ -1,4 +1,3 @@
-using System.Text;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,8 +20,7 @@ namespace Server.Sockets.Other
 		public async Task SendMessageAsync(IWebSocket socket, ISendMessage message)
 		{
 			var buffer = deserializer.SerializeToBuffer(message);
-			logger.LogInformation($"Sending msg: {message.GetType()};"
-				+ $" {Encoding.UTF8.GetString(buffer, 0, buffer.Length)}");
+			logger.LogInformation($"Sending msg: {message.GetType()}");
 			if (socket.State == WebSocketState.Open)
 				await socket.SendAsync(buffer, WebSocketMessageType.Text,
 					true, CancellationToken.None);

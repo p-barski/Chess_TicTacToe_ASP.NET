@@ -8,6 +8,7 @@ namespace Server.Games.TicTacToe
 		public Guid GUID { get; } = Guid.NewGuid();
 		public IPlayer PlayerOne { get; }
 		public IPlayer PlayerTwo { get; }
+		public DateTime StartDate { get; } = DateTime.UtcNow;
 		private Game game;
 		public TicTacToeGameSession(IPlayer playerOne, IPlayer playerTwo, int size)
 		{
