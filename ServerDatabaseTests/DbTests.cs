@@ -72,7 +72,9 @@ namespace ServerDatabaseTests
 			var password = "password1";
 			var database = "testdb";
 			var efCoreConnectionString =
-				$"Host={host};Port={port};Username={username};Password={password};Database={database}";
+				$"Host={host};Port={port};Username={username};" +
+				$"Password={password};Database={database};" +
+				$"SSL Mode=Require;Pooling=True;Trust Server Certificate=True";
 
 			var databaseUrl = $"postgres://{username}:{password}@{host}:{port}/{database}";
 			var connectionString = NpgsqlUrlParser.ParseToEFCoreConnectionString(databaseUrl);

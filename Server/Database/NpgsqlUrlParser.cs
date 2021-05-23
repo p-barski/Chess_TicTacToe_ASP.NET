@@ -17,7 +17,10 @@ namespace Server.Database
 				Port = uri.Port,
 				Username = userInfo[0],
 				Password = userInfo[1],
-				Database = uri.LocalPath.TrimStart('/')
+				Database = uri.LocalPath.TrimStart('/'),
+				SslMode = SslMode.Require,
+				Pooling = true,
+				TrustServerCertificate = true,
 			};
 			return builder.ToString();
 		}
