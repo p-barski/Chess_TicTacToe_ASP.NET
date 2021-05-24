@@ -34,6 +34,7 @@ namespace Server
 			services.AddSingleton<ICollections, Collections>();
 			services.AddSingleton<IMessageDeserializer, MessageDeserializer>();
 			services.AddSingleton<IMessageSender, MessageSender>();
+			services.AddSingleton<IMessageHandler, CancelSessionHandler>();
 			services.AddSingleton<IMessageHandler, FindGameHandler>();
 			services.AddSingleton<IMessageHandler, FindChessGameHandler>();
 			services.AddSingleton<IMessageHandler, MakeChessMoveHandler>();

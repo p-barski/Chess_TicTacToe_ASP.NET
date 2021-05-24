@@ -593,6 +593,37 @@ namespace ServerTests
 			await clientSocket3.CloseAsync(status, "", cts.Token);
 			await clientSocket4.CloseAsync(status, "", cts.Token);
 		}
+		[Test]
+		public async Task CancelingChessSessionSendsMessageToTheOtherPlayer()
+		{
+			var cts = new CancellationTokenSource();
+
+			var clientSocket1 = new ClientWebSocket();
+			var clientSocket2 = new ClientWebSocket();
+
+			await clientSocket1.ConnectAsync(serverUrl, cts.Token);
+			await clientSocket2.ConnectAsync(serverUrl, cts.Token);
+
+			var findMsg = new FindChessGameMessage() { ChessGame = true };
+
+			await SendThroughSocketAsync(clientSocket1, findMsg, cts.Token);
+			await SendThroughSocketAsync(clientSocket2, findMsg, cts.Token);
+
+			await ReceiveFromSocketAsync<GameFoundMessage>(clientSocket1);
+			await ReceiveFromSocketAsync<GameFoundMessage>(clientSocket2);
+			await ReceiveFromSocketAsync<dynamic>(clientSocket1);
+			await ReceiveFromSocketAsync<dynamic>(clientSocket2);
+
+			var cancelSessionMsg = new CancelSessionMessage();
+
+			await SendThroughSocketAsync(clientSocket1, cancelSessionMsg, cts.Token);
+
+			await ReceiveFromSocketAsync<SessionClosedMessage>(clientSocket2);
+
+			var status = WebSocketCloseStatus.NormalClosure;
+			await clientSocket1.CloseAsync(status, "", cts.Token);
+			await clientSocket2.CloseAsync(status, "", cts.Token);
+		}
 
 		private async Task<T> ReceiveFromSocketAsync<T>(WebSocket socket)
 		{
