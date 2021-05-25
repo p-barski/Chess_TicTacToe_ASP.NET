@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Text;
 using System.Net.WebSockets;
 using System.Threading;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using Server;
+using Server.Database;
 
 namespace ServerTests
 {
@@ -57,6 +59,20 @@ namespace ServerTests
 			var buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(msgObject));
 			await socket.SendAsync(buffer, WebSocketMessageType.Text, true, token);
 			await Task.Delay(5);
+		}
+		public void DeleteSqliteDatabase()
+		{
+			if (EnvironmentVariableGetter.GetWhetherToUsePostgresEnvironmentVar())
+			{
+				return;
+			}
+			var conn = EnvironmentVariableGetter.GetConnectionStringEnvironmentVar();
+			var sqliteFile = conn.Substring(12);
+			try
+			{
+				File.Delete(sqliteFile);
+			}
+			catch (IOException) { }
 		}
 	}
 }

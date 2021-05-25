@@ -43,6 +43,11 @@ namespace Server.Sockets.Other
 				return JsonConvert.DeserializeObject<CancelSessionMessage>(json, jsonSettings);
 			}
 			catch (JsonException) { }
+			try
+			{
+				return JsonConvert.DeserializeObject<AuthenticationMessage>(json, jsonSettings);
+			}
+			catch (JsonException) { }
 			return new IncorrectMessage() { Json = json };
 		}
 		public byte[] SerializeToBuffer<T>(T message)
