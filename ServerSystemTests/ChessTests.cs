@@ -1,14 +1,8 @@
-using System;
-using System.Text;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
 using NUnit.Framework;
-using Newtonsoft.Json;
-using Server;
 using Server.Games;
 using Server.Sockets.Messages;
 
@@ -16,23 +10,17 @@ namespace ServerTests
 {
 	public class ChessTests
 	{
-		private IHost host;
-		private Thread serverThread;
-		private Uri serverUrl = new Uri("ws://localhost:5000");
-		private int timeoutMiliseconds = 500;
+		private TestUtils utils;
 		[SetUp]
 		public async Task Setup()
 		{
-			host = Program.CreateHostBuilder(new string[0]).Build();
-			serverThread = new Thread(() => host.Start());
-			serverThread.Start();
-			await Task.Delay(1000);
+			utils = new TestUtils();
+			await utils.Setup();
 		}
 		[TearDown]
 		public async Task TearDown()
 		{
-			await host.StopAsync();
-			serverThread.Join();
+			await utils.TearDown();
 		}
 		[Test]
 		public async Task ClosingConnectionRightAfterSendingFindChessGameMessageWontCreateGameSession()
@@ -42,20 +30,20 @@ namespace ServerTests
 			var clientSocket1 = new ClientWebSocket();
 			var clientSocket2 = new ClientWebSocket();
 
-			await clientSocket1.ConnectAsync(serverUrl, cts.Token);
-			await clientSocket2.ConnectAsync(serverUrl, cts.Token);
+			await clientSocket1.ConnectAsync(utils.serverUrl, cts.Token);
+			await clientSocket2.ConnectAsync(utils.serverUrl, cts.Token);
 
 			var findMsg = new FindChessGameMessage() { ChessGame = true };
 
-			await SendThroughSocketAsync(clientSocket1, findMsg, cts.Token);
+			await utils.SendThroughSocketAsync(clientSocket1, findMsg, cts.Token);
 
 			var status = WebSocketCloseStatus.NormalClosure;
 			await clientSocket1.CloseAsync(status, "", cts.Token);
 
-			await SendThroughSocketAsync(clientSocket2, findMsg, cts.Token);
+			await utils.SendThroughSocketAsync(clientSocket2, findMsg, cts.Token);
 
 			Assert.ThrowsAsync<TaskCanceledException>(async () =>
-				await ReceiveFromSocketAsync<GameFoundMessage>(
+				await utils.ReceiveFromSocketAsync<GameFoundMessage>(
 				clientSocket2));
 		}
 		[Test]
@@ -66,17 +54,17 @@ namespace ServerTests
 			var clientSocket1 = new ClientWebSocket();
 			var clientSocket2 = new ClientWebSocket();
 
-			await clientSocket1.ConnectAsync(serverUrl, cts.Token);
-			await clientSocket2.ConnectAsync(serverUrl, cts.Token);
+			await clientSocket1.ConnectAsync(utils.serverUrl, cts.Token);
+			await clientSocket2.ConnectAsync(utils.serverUrl, cts.Token);
 
 			var findMsg = new FindChessGameMessage() { ChessGame = true };
 
-			await SendThroughSocketAsync(clientSocket1, findMsg, cts.Token);
-			await SendThroughSocketAsync(clientSocket2, findMsg, cts.Token);
+			await utils.SendThroughSocketAsync(clientSocket1, findMsg, cts.Token);
+			await utils.SendThroughSocketAsync(clientSocket2, findMsg, cts.Token);
 
-			var gameFoundMsg1 = await ReceiveFromSocketAsync<GameFoundMessage>(
+			var gameFoundMsg1 = await utils.ReceiveFromSocketAsync<GameFoundMessage>(
 				clientSocket1);
-			var gameFoundMsg2 = await ReceiveFromSocketAsync<GameFoundMessage>(
+			var gameFoundMsg2 = await utils.ReceiveFromSocketAsync<GameFoundMessage>(
 				clientSocket2);
 
 			Assert.AreNotEqual(gameFoundMsg1.IsClientTurn,
@@ -94,21 +82,21 @@ namespace ServerTests
 			var clientSocket1 = new ClientWebSocket();
 			var clientSocket2 = new ClientWebSocket();
 
-			await clientSocket1.ConnectAsync(serverUrl, cts.Token);
-			await clientSocket2.ConnectAsync(serverUrl, cts.Token);
+			await clientSocket1.ConnectAsync(utils.serverUrl, cts.Token);
+			await clientSocket2.ConnectAsync(utils.serverUrl, cts.Token);
 
 			var findMsg = new FindChessGameMessage() { ChessGame = true };
 
-			await SendThroughSocketAsync(clientSocket1, findMsg, cts.Token);
-			await SendThroughSocketAsync(clientSocket2, findMsg, cts.Token);
+			await utils.SendThroughSocketAsync(clientSocket1, findMsg, cts.Token);
+			await utils.SendThroughSocketAsync(clientSocket2, findMsg, cts.Token);
 
-			var gameFoundMsg1 = await ReceiveFromSocketAsync<GameFoundMessage>(
+			var gameFoundMsg1 = await utils.ReceiveFromSocketAsync<GameFoundMessage>(
 				clientSocket1);
-			var gameFoundMsg2 = await ReceiveFromSocketAsync<GameFoundMessage>(
+			var gameFoundMsg2 = await utils.ReceiveFromSocketAsync<GameFoundMessage>(
 				clientSocket2);
 
-			var piecesAndMovesMsg1 = await ReceiveFromSocketAsync<dynamic>(clientSocket1);
-			var piecesAndMovesMsg2 = await ReceiveFromSocketAsync<dynamic>(clientSocket2);
+			var piecesAndMovesMsg1 = await utils.ReceiveFromSocketAsync<dynamic>(clientSocket1);
+			var piecesAndMovesMsg2 = await utils.ReceiveFromSocketAsync<dynamic>(clientSocket2);
 
 			Assert.AreEqual(32, piecesAndMovesMsg1.Pieces.Count);
 			Assert.AreEqual(32, piecesAndMovesMsg2.Pieces.Count);
@@ -127,22 +115,22 @@ namespace ServerTests
 			var clientSocket1 = new ClientWebSocket();
 			var clientSocket2 = new ClientWebSocket();
 
-			await clientSocket1.ConnectAsync(serverUrl, cts.Token);
-			await clientSocket2.ConnectAsync(serverUrl, cts.Token);
+			await clientSocket1.ConnectAsync(utils.serverUrl, cts.Token);
+			await clientSocket2.ConnectAsync(utils.serverUrl, cts.Token);
 
 			var findMsg = new FindChessGameMessage() { ChessGame = true };
 
-			await SendThroughSocketAsync(clientSocket1, findMsg, cts.Token);
-			await SendThroughSocketAsync(clientSocket2, findMsg, cts.Token);
+			await utils.SendThroughSocketAsync(clientSocket1, findMsg, cts.Token);
+			await utils.SendThroughSocketAsync(clientSocket2, findMsg, cts.Token);
 
-			await ReceiveFromSocketAsync<GameFoundMessage>(
+			await utils.ReceiveFromSocketAsync<GameFoundMessage>(
 				clientSocket1);
-			await ReceiveFromSocketAsync<GameFoundMessage>(
+			await utils.ReceiveFromSocketAsync<GameFoundMessage>(
 				clientSocket2);
 
 			var status = WebSocketCloseStatus.NormalClosure;
 			await clientSocket1.CloseAsync(status, "", cts.Token);
-			await ReceiveFromSocketAsync<SessionClosedMessage>(
+			await utils.ReceiveFromSocketAsync<SessionClosedMessage>(
 				clientSocket2);
 
 			await clientSocket2.CloseAsync(status, "", cts.Token);
@@ -154,7 +142,7 @@ namespace ServerTests
 
 			var clientSocket1 = new ClientWebSocket();
 
-			await clientSocket1.ConnectAsync(serverUrl, cts.Token);
+			await clientSocket1.ConnectAsync(utils.serverUrl, cts.Token);
 			var makeMoveMsg = new MakeChessMoveMessage()
 			{
 				X_StartPosition = 1,
@@ -163,9 +151,9 @@ namespace ServerTests
 				Y_FinishedPosition = 3
 			};
 
-			await SendThroughSocketAsync(clientSocket1, makeMoveMsg, cts.Token);
+			await utils.SendThroughSocketAsync(clientSocket1, makeMoveMsg, cts.Token);
 
-			await ReceiveFromSocketAsync<InvalidStateMessage>(clientSocket1);
+			await utils.ReceiveFromSocketAsync<InvalidStateMessage>(clientSocket1);
 		}
 		[Test]
 		public async Task MakingCorrectMoveReturnsChessMoveResultMessageWithSuccessMessage()
@@ -175,21 +163,21 @@ namespace ServerTests
 			var clientSocket1 = new ClientWebSocket();
 			var clientSocket2 = new ClientWebSocket();
 
-			await clientSocket1.ConnectAsync(serverUrl, cts.Token);
-			await clientSocket2.ConnectAsync(serverUrl, cts.Token);
+			await clientSocket1.ConnectAsync(utils.serverUrl, cts.Token);
+			await clientSocket2.ConnectAsync(utils.serverUrl, cts.Token);
 
 			var findMsg = new FindChessGameMessage() { ChessGame = true };
 
-			await SendThroughSocketAsync(clientSocket1, findMsg, cts.Token);
-			await SendThroughSocketAsync(clientSocket2, findMsg, cts.Token);
+			await utils.SendThroughSocketAsync(clientSocket1, findMsg, cts.Token);
+			await utils.SendThroughSocketAsync(clientSocket2, findMsg, cts.Token);
 
-			var gameFoundMsg1 = await ReceiveFromSocketAsync<GameFoundMessage>(
+			var gameFoundMsg1 = await utils.ReceiveFromSocketAsync<GameFoundMessage>(
 				clientSocket1);
-			var gameFoundMsg2 = await ReceiveFromSocketAsync<GameFoundMessage>(
+			var gameFoundMsg2 = await utils.ReceiveFromSocketAsync<GameFoundMessage>(
 				clientSocket2);
 
-			await ReceiveFromSocketAsync<dynamic>(clientSocket1);
-			await ReceiveFromSocketAsync<dynamic>(clientSocket2);
+			await utils.ReceiveFromSocketAsync<dynamic>(clientSocket1);
+			await utils.ReceiveFromSocketAsync<dynamic>(clientSocket2);
 
 			ClientWebSocket firstPlayerSocket, secondPlayerSocket;
 			if (gameFoundMsg1.IsClientTurn)
@@ -211,11 +199,11 @@ namespace ServerTests
 				Y_FinishedPosition = 3
 			};
 
-			await SendThroughSocketAsync(firstPlayerSocket, makeMoveMsg, cts.Token);
+			await utils.SendThroughSocketAsync(firstPlayerSocket, makeMoveMsg, cts.Token);
 
-			var moveResultMessage1 = await ReceiveFromSocketAsync<ChessPlayResultMessage>(
+			var moveResultMessage1 = await utils.ReceiveFromSocketAsync<ChessPlayResultMessage>(
 				firstPlayerSocket);
-			var moveResultMessage2 = await ReceiveFromSocketAsync<ChessPlayResultMessage>(
+			var moveResultMessage2 = await utils.ReceiveFromSocketAsync<ChessPlayResultMessage>(
 				secondPlayerSocket);
 
 			Assert.AreEqual(PlayResult.Success.ToString(), moveResultMessage1.Message);
@@ -233,21 +221,21 @@ namespace ServerTests
 			var clientSocket1 = new ClientWebSocket();
 			var clientSocket2 = new ClientWebSocket();
 
-			await clientSocket1.ConnectAsync(serverUrl, cts.Token);
-			await clientSocket2.ConnectAsync(serverUrl, cts.Token);
+			await clientSocket1.ConnectAsync(utils.serverUrl, cts.Token);
+			await clientSocket2.ConnectAsync(utils.serverUrl, cts.Token);
 
 			var findMsg = new FindChessGameMessage() { ChessGame = true };
 
-			await SendThroughSocketAsync(clientSocket1, findMsg, cts.Token);
-			await SendThroughSocketAsync(clientSocket2, findMsg, cts.Token);
+			await utils.SendThroughSocketAsync(clientSocket1, findMsg, cts.Token);
+			await utils.SendThroughSocketAsync(clientSocket2, findMsg, cts.Token);
 
-			var gameFoundMsg1 = await ReceiveFromSocketAsync<GameFoundMessage>(
+			var gameFoundMsg1 = await utils.ReceiveFromSocketAsync<GameFoundMessage>(
 				clientSocket1);
-			var gameFoundMsg2 = await ReceiveFromSocketAsync<GameFoundMessage>(
+			var gameFoundMsg2 = await utils.ReceiveFromSocketAsync<GameFoundMessage>(
 				clientSocket2);
 
-			await ReceiveFromSocketAsync<dynamic>(clientSocket1);
-			await ReceiveFromSocketAsync<dynamic>(clientSocket2);
+			await utils.ReceiveFromSocketAsync<dynamic>(clientSocket1);
+			await utils.ReceiveFromSocketAsync<dynamic>(clientSocket2);
 
 			ClientWebSocket firstPlayerSocket, secondPlayerSocket;
 			if (gameFoundMsg1.IsClientTurn)
@@ -269,12 +257,12 @@ namespace ServerTests
 				Y_FinishedPosition = 3
 			};
 
-			await SendThroughSocketAsync(secondPlayerSocket, makeMoveMsg, cts.Token);
+			await utils.SendThroughSocketAsync(secondPlayerSocket, makeMoveMsg, cts.Token);
 
-			var chessPlayMessage = await ReceiveFromSocketAsync<ChessPlayResultMessage>(
+			var chessPlayMessage = await utils.ReceiveFromSocketAsync<ChessPlayResultMessage>(
 				secondPlayerSocket);
 			Assert.ThrowsAsync<TaskCanceledException>(async () =>
-				await ReceiveFromSocketAsync<ChessPlayResultMessage>(firstPlayerSocket));
+				await utils.ReceiveFromSocketAsync<ChessPlayResultMessage>(firstPlayerSocket));
 
 			Assert.AreEqual(PlayResult.NotYourTurn.ToString(),
 				chessPlayMessage.Message);
@@ -290,21 +278,21 @@ namespace ServerTests
 			var clientSocket1 = new ClientWebSocket();
 			var clientSocket2 = new ClientWebSocket();
 
-			await clientSocket1.ConnectAsync(serverUrl, cts.Token);
-			await clientSocket2.ConnectAsync(serverUrl, cts.Token);
+			await clientSocket1.ConnectAsync(utils.serverUrl, cts.Token);
+			await clientSocket2.ConnectAsync(utils.serverUrl, cts.Token);
 
 			var findMsg = new FindChessGameMessage() { ChessGame = true };
 
-			await SendThroughSocketAsync(clientSocket1, findMsg, cts.Token);
-			await SendThroughSocketAsync(clientSocket2, findMsg, cts.Token);
+			await utils.SendThroughSocketAsync(clientSocket1, findMsg, cts.Token);
+			await utils.SendThroughSocketAsync(clientSocket2, findMsg, cts.Token);
 
-			var gameFoundMsg1 = await ReceiveFromSocketAsync<GameFoundMessage>(
+			var gameFoundMsg1 = await utils.ReceiveFromSocketAsync<GameFoundMessage>(
 				clientSocket1);
-			var gameFoundMsg2 = await ReceiveFromSocketAsync<GameFoundMessage>(
+			var gameFoundMsg2 = await utils.ReceiveFromSocketAsync<GameFoundMessage>(
 				clientSocket2);
 
-			await ReceiveFromSocketAsync<dynamic>(clientSocket1);
-			await ReceiveFromSocketAsync<dynamic>(clientSocket2);
+			await utils.ReceiveFromSocketAsync<dynamic>(clientSocket1);
+			await utils.ReceiveFromSocketAsync<dynamic>(clientSocket2);
 
 			ClientWebSocket currentPlayerSocket, nextPlayerSocket;
 			if (gameFoundMsg1.IsClientTurn)
@@ -352,14 +340,14 @@ namespace ServerTests
 
 			foreach (var moveMsg in moveMsgs)
 			{
-				await SendThroughSocketAsync(currentPlayerSocket, moveMsg, cts.Token);
+				await utils.SendThroughSocketAsync(currentPlayerSocket, moveMsg, cts.Token);
 				resultMessage1 =
-					await ReceiveFromSocketAsync<ChessPlayResultMessage>(currentPlayerSocket);
+					await utils.ReceiveFromSocketAsync<ChessPlayResultMessage>(currentPlayerSocket);
 				resultMessage2 =
-					await ReceiveFromSocketAsync<ChessPlayResultMessage>(nextPlayerSocket);
+					await utils.ReceiveFromSocketAsync<ChessPlayResultMessage>(nextPlayerSocket);
 
-				await ReceiveFromSocketAsync<dynamic>(currentPlayerSocket);
-				await ReceiveFromSocketAsync<dynamic>(nextPlayerSocket);
+				await utils.ReceiveFromSocketAsync<dynamic>(currentPlayerSocket);
+				await utils.ReceiveFromSocketAsync<dynamic>(nextPlayerSocket);
 
 				(currentPlayerSocket, nextPlayerSocket) = (nextPlayerSocket, currentPlayerSocket);
 			}
@@ -379,21 +367,21 @@ namespace ServerTests
 			var clientSocket1 = new ClientWebSocket();
 			var clientSocket2 = new ClientWebSocket();
 
-			await clientSocket1.ConnectAsync(serverUrl, cts.Token);
-			await clientSocket2.ConnectAsync(serverUrl, cts.Token);
+			await clientSocket1.ConnectAsync(utils.serverUrl, cts.Token);
+			await clientSocket2.ConnectAsync(utils.serverUrl, cts.Token);
 
 			var findMsg = new FindChessGameMessage() { ChessGame = true };
 
-			await SendThroughSocketAsync(clientSocket1, findMsg, cts.Token);
-			await SendThroughSocketAsync(clientSocket2, findMsg, cts.Token);
+			await utils.SendThroughSocketAsync(clientSocket1, findMsg, cts.Token);
+			await utils.SendThroughSocketAsync(clientSocket2, findMsg, cts.Token);
 
-			var gameFoundMsg1 = await ReceiveFromSocketAsync<GameFoundMessage>(
+			var gameFoundMsg1 = await utils.ReceiveFromSocketAsync<GameFoundMessage>(
 				clientSocket1);
-			var gameFoundMsg2 = await ReceiveFromSocketAsync<GameFoundMessage>(
+			var gameFoundMsg2 = await utils.ReceiveFromSocketAsync<GameFoundMessage>(
 				clientSocket2);
 
-			await ReceiveFromSocketAsync<dynamic>(clientSocket1);
-			await ReceiveFromSocketAsync<dynamic>(clientSocket2);
+			await utils.ReceiveFromSocketAsync<dynamic>(clientSocket1);
+			await utils.ReceiveFromSocketAsync<dynamic>(clientSocket2);
 
 			ClientWebSocket currentPlayerSocket, nextPlayerSocket;
 			if (gameFoundMsg1.IsClientTurn)
@@ -457,12 +445,12 @@ namespace ServerTests
 
 			foreach (var moveMsg in moveMsgs)
 			{
-				await SendThroughSocketAsync(currentPlayerSocket, moveMsg, cts.Token);
-				await ReceiveFromSocketAsync<ChessPlayResultMessage>(currentPlayerSocket);
-				await ReceiveFromSocketAsync<ChessPlayResultMessage>(nextPlayerSocket);
+				await utils.SendThroughSocketAsync(currentPlayerSocket, moveMsg, cts.Token);
+				await utils.ReceiveFromSocketAsync<ChessPlayResultMessage>(currentPlayerSocket);
+				await utils.ReceiveFromSocketAsync<ChessPlayResultMessage>(nextPlayerSocket);
 
-				await ReceiveFromSocketAsync<dynamic>(currentPlayerSocket);
-				await ReceiveFromSocketAsync<dynamic>(nextPlayerSocket);
+				await utils.ReceiveFromSocketAsync<dynamic>(currentPlayerSocket);
+				await utils.ReceiveFromSocketAsync<dynamic>(nextPlayerSocket);
 
 				(currentPlayerSocket, nextPlayerSocket) = (nextPlayerSocket, currentPlayerSocket);
 			}
@@ -476,9 +464,9 @@ namespace ServerTests
 				Y_FinishedPosition = 0
 			};
 
-			await SendThroughSocketAsync(currentPlayerSocket, moveBeforePromotionMsg, cts.Token);
+			await utils.SendThroughSocketAsync(currentPlayerSocket, moveBeforePromotionMsg, cts.Token);
 			var resultMessage =
-				await ReceiveFromSocketAsync<ChessPlayResultMessage>(currentPlayerSocket);
+				await utils.ReceiveFromSocketAsync<ChessPlayResultMessage>(currentPlayerSocket);
 			Assert.AreEqual(PlayResult.PromotionRequired.ToString(), resultMessage.Message);
 
 			var promotionMoveMsg = new PawnPromotionMessage()
@@ -486,12 +474,12 @@ namespace ServerTests
 				PromotionPiece = "Queen"
 			};
 
-			await SendThroughSocketAsync(currentPlayerSocket, promotionMoveMsg, cts.Token);
-			await ReceiveFromSocketAsync<ChessPlayResultMessage>(currentPlayerSocket);
-			await ReceiveFromSocketAsync<ChessPlayResultMessage>(nextPlayerSocket);
+			await utils.SendThroughSocketAsync(currentPlayerSocket, promotionMoveMsg, cts.Token);
+			await utils.ReceiveFromSocketAsync<ChessPlayResultMessage>(currentPlayerSocket);
+			await utils.ReceiveFromSocketAsync<ChessPlayResultMessage>(nextPlayerSocket);
 
-			await ReceiveFromSocketAsync<dynamic>(currentPlayerSocket);
-			await ReceiveFromSocketAsync<dynamic>(nextPlayerSocket);
+			await utils.ReceiveFromSocketAsync<dynamic>(currentPlayerSocket);
+			await utils.ReceiveFromSocketAsync<dynamic>(nextPlayerSocket);
 
 			var status = WebSocketCloseStatus.NormalClosure;
 			await clientSocket1.CloseAsync(status, "", cts.Token);
@@ -507,32 +495,32 @@ namespace ServerTests
 			var clientSocket3 = new ClientWebSocket();
 			var clientSocket4 = new ClientWebSocket();
 
-			await clientSocket1.ConnectAsync(serverUrl, cts.Token);
-			await clientSocket2.ConnectAsync(serverUrl, cts.Token);
-			await clientSocket3.ConnectAsync(serverUrl, cts.Token);
-			await clientSocket4.ConnectAsync(serverUrl, cts.Token);
+			await clientSocket1.ConnectAsync(utils.serverUrl, cts.Token);
+			await clientSocket2.ConnectAsync(utils.serverUrl, cts.Token);
+			await clientSocket3.ConnectAsync(utils.serverUrl, cts.Token);
+			await clientSocket4.ConnectAsync(utils.serverUrl, cts.Token);
 
 			var findMsg = new FindChessGameMessage() { ChessGame = true };
 
-			await SendThroughSocketAsync(clientSocket1, findMsg, cts.Token);
-			await SendThroughSocketAsync(clientSocket2, findMsg, cts.Token);
-			await SendThroughSocketAsync(clientSocket3, findMsg, cts.Token);
-			await SendThroughSocketAsync(clientSocket4, findMsg, cts.Token);
+			await utils.SendThroughSocketAsync(clientSocket1, findMsg, cts.Token);
+			await utils.SendThroughSocketAsync(clientSocket2, findMsg, cts.Token);
+			await utils.SendThroughSocketAsync(clientSocket3, findMsg, cts.Token);
+			await utils.SendThroughSocketAsync(clientSocket4, findMsg, cts.Token);
 
-			var gameFoundMsg1 = await ReceiveFromSocketAsync<GameFoundMessage>(
+			var gameFoundMsg1 = await utils.ReceiveFromSocketAsync<GameFoundMessage>(
 				clientSocket1);
-			var gameFoundMsg2 = await ReceiveFromSocketAsync<GameFoundMessage>(
+			var gameFoundMsg2 = await utils.ReceiveFromSocketAsync<GameFoundMessage>(
 				clientSocket2);
 
-			var gameFoundMsg3 = await ReceiveFromSocketAsync<GameFoundMessage>(
+			var gameFoundMsg3 = await utils.ReceiveFromSocketAsync<GameFoundMessage>(
 				clientSocket3);
-			var gameFoundMsg4 = await ReceiveFromSocketAsync<GameFoundMessage>(
+			var gameFoundMsg4 = await utils.ReceiveFromSocketAsync<GameFoundMessage>(
 				clientSocket4);
 
-			await ReceiveFromSocketAsync<dynamic>(clientSocket1);
-			await ReceiveFromSocketAsync<dynamic>(clientSocket2);
-			await ReceiveFromSocketAsync<dynamic>(clientSocket3);
-			await ReceiveFromSocketAsync<dynamic>(clientSocket4);
+			await utils.ReceiveFromSocketAsync<dynamic>(clientSocket1);
+			await utils.ReceiveFromSocketAsync<dynamic>(clientSocket2);
+			await utils.ReceiveFromSocketAsync<dynamic>(clientSocket3);
+			await utils.ReceiveFromSocketAsync<dynamic>(clientSocket4);
 
 			Assert.AreNotEqual(gameFoundMsg1.IsClientTurn, gameFoundMsg2.IsClientTurn);
 			Assert.AreNotEqual(gameFoundMsg3.IsClientTurn, gameFoundMsg4.IsClientTurn);
@@ -571,20 +559,20 @@ namespace ServerTests
 				Y_FinishedPosition = 3
 			};
 
-			await SendThroughSocketAsync(firstPlayerSocketOfSecondSession,
+			await utils.SendThroughSocketAsync(firstPlayerSocketOfSecondSession,
 				chessMoveMsg, cts.Token);
 
-			var moveResultMsg1 = await ReceiveFromSocketAsync<ChessPlayResultMessage>(
+			var moveResultMsg1 = await utils.ReceiveFromSocketAsync<ChessPlayResultMessage>(
 				firstPlayerSocketOfSecondSession);
-			var moveResultMsg2 = await ReceiveFromSocketAsync<ChessPlayResultMessage>(
+			var moveResultMsg2 = await utils.ReceiveFromSocketAsync<ChessPlayResultMessage>(
 				secondPlayerSocketOfSecondSession);
 
-			await SendThroughSocketAsync(firstPlayerSocketOfFirstSession,
+			await utils.SendThroughSocketAsync(firstPlayerSocketOfFirstSession,
 				chessMoveMsg, cts.Token);
 
-			var moveResultMsg3 = await ReceiveFromSocketAsync<ChessPlayResultMessage>(
+			var moveResultMsg3 = await utils.ReceiveFromSocketAsync<ChessPlayResultMessage>(
 				firstPlayerSocketOfFirstSession);
-			var moveResultMsg4 = await ReceiveFromSocketAsync<ChessPlayResultMessage>(
+			var moveResultMsg4 = await utils.ReceiveFromSocketAsync<ChessPlayResultMessage>(
 				secondPlayerSocketOfFirstSession);
 
 			var status = WebSocketCloseStatus.NormalClosure;
@@ -601,58 +589,28 @@ namespace ServerTests
 			var clientSocket1 = new ClientWebSocket();
 			var clientSocket2 = new ClientWebSocket();
 
-			await clientSocket1.ConnectAsync(serverUrl, cts.Token);
-			await clientSocket2.ConnectAsync(serverUrl, cts.Token);
+			await clientSocket1.ConnectAsync(utils.serverUrl, cts.Token);
+			await clientSocket2.ConnectAsync(utils.serverUrl, cts.Token);
 
 			var findMsg = new FindChessGameMessage() { ChessGame = true };
 
-			await SendThroughSocketAsync(clientSocket1, findMsg, cts.Token);
-			await SendThroughSocketAsync(clientSocket2, findMsg, cts.Token);
+			await utils.SendThroughSocketAsync(clientSocket1, findMsg, cts.Token);
+			await utils.SendThroughSocketAsync(clientSocket2, findMsg, cts.Token);
 
-			await ReceiveFromSocketAsync<GameFoundMessage>(clientSocket1);
-			await ReceiveFromSocketAsync<GameFoundMessage>(clientSocket2);
-			await ReceiveFromSocketAsync<dynamic>(clientSocket1);
-			await ReceiveFromSocketAsync<dynamic>(clientSocket2);
+			await utils.ReceiveFromSocketAsync<GameFoundMessage>(clientSocket1);
+			await utils.ReceiveFromSocketAsync<GameFoundMessage>(clientSocket2);
+			await utils.ReceiveFromSocketAsync<dynamic>(clientSocket1);
+			await utils.ReceiveFromSocketAsync<dynamic>(clientSocket2);
 
 			var cancelSessionMsg = new CancelSessionMessage();
 
-			await SendThroughSocketAsync(clientSocket1, cancelSessionMsg, cts.Token);
+			await utils.SendThroughSocketAsync(clientSocket1, cancelSessionMsg, cts.Token);
 
-			await ReceiveFromSocketAsync<SessionClosedMessage>(clientSocket2);
+			await utils.ReceiveFromSocketAsync<SessionClosedMessage>(clientSocket2);
 
 			var status = WebSocketCloseStatus.NormalClosure;
 			await clientSocket1.CloseAsync(status, "", cts.Token);
 			await clientSocket2.CloseAsync(status, "", cts.Token);
-		}
-
-		private async Task<T> ReceiveFromSocketAsync<T>(WebSocket socket)
-		{
-			var cts = new CancellationTokenSource();
-			var buffer = new byte[16384];
-			var resultTask = socket.ReceiveAsync(buffer, cts.Token);
-			int counter = 0;
-			int delayTime = 10;
-			while (!resultTask.IsCompleted)
-			{
-				if (counter * delayTime > timeoutMiliseconds)
-				{
-					cts.Cancel();
-					break;
-				}
-				await Task.Delay(delayTime);
-				counter++;
-			}
-			var result = await resultTask;
-			var jsonStr = Encoding.UTF8.GetString(buffer, 0, result.Count);
-			var settings = new JsonSerializerSettings();
-			settings.MissingMemberHandling = MissingMemberHandling.Error;
-			return JsonConvert.DeserializeObject<T>(jsonStr, settings);
-		}
-		private async Task SendThroughSocketAsync<T>(WebSocket socket, T msgObject, CancellationToken token)
-		{
-			var buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(msgObject));
-			await socket.SendAsync(buffer, WebSocketMessageType.Text, true, token);
-			await Task.Delay(5);
 		}
 	}
 }
