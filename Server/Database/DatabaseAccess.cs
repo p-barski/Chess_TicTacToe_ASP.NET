@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Server.Database.Chess;
 
 namespace Server.Database
@@ -40,17 +41,25 @@ namespace Server.Database
 			await context.AddAsync(chessGame);
 			await context.SaveChangesAsync();
 		}
-		public PlayerData GetPlayerData(string name, string password)
+		public PlayerData GetPlayerData(string name)
 		{
 			using var context = new GamesDbContext(connectionString, usePostgres);
 			return context.PlayerDatas
-				.FirstOrDefault(u => u.Name == name && u.Password == password);
+				.FirstOrDefault(u => u.Name == name);
 		}
-		public async Task SavePlayerDataAsync(PlayerData playerData)
+		public async Task<bool> SavePlayerDataAsync(PlayerData playerData)
 		{
 			using var context = new GamesDbContext(connectionString, usePostgres);
-			await context.AddAsync(playerData);
-			await context.SaveChangesAsync();
+			try
+			{
+				await context.AddAsync(playerData);
+				await context.SaveChangesAsync();
+			}
+			catch (DbUpdateException)
+			{
+				return false;
+			}
+			return true;
 		}
 		private PlayerData GetOrCreatePlayerDataForNotLoggedInPlayers(GamesDbContext context)
 		{

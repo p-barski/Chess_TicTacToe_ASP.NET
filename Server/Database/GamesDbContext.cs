@@ -28,7 +28,9 @@ namespace Server.Database
 		{
 			modelBuilder.Entity<ChessGameDb>().ToTable("ChessGame");
 			modelBuilder.Entity<ChessMoveDb>().ToTable("ChessMove");
-			modelBuilder.Entity<PlayerData>().ToTable("PlayerData");
+			modelBuilder.Entity<PlayerData>().ToTable("PlayerData")
+				.HasIndex(p => p.Name)
+				.IsUnique();
 		}
 	}
 }
