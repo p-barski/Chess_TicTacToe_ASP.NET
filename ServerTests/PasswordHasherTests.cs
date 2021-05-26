@@ -53,5 +53,14 @@ namespace ServerTests
 
 			Assert.IsFalse(hasher.IsPasswordCorrect(incorrectPassword, hashedPassword));
 		}
+		[Test]
+		public void IsPasswordCorrectReturnsFalseWhenHashedPasswordIsEmpty()
+		{
+			var password = "passworD123";
+			var emptyPassword = "";
+
+			var hasher = new PasswordHasher();
+			Assert.IsFalse(hasher.IsPasswordCorrect(password, emptyPassword));
+		}
 	}
 }

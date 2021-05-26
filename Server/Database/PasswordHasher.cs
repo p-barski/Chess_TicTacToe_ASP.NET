@@ -22,6 +22,10 @@ namespace Server.Database
 		}
 		public bool IsPasswordCorrect(string password, string hashedPassword)
 		{
+			if (hashedPassword == "")
+			{
+				return false;
+			}
 			byte[] hashAndSalt = Convert.FromBase64String(hashedPassword);
 			byte[] salt = new byte[saltSize];
 			Array.Copy(hashAndSalt, 0, salt, 0, saltSize);

@@ -22,6 +22,58 @@ namespace ServerTests
 			await utils.TearDown();
 		}
 		[Test]
+		public async Task TryingToLogInAsAnonymousReturnsErrorMessage()
+		{
+			var cts = new CancellationTokenSource();
+
+			var clientSocket = new ClientWebSocket();
+
+			await clientSocket.ConnectAsync(utils.serverUrl, cts.Token);
+
+			var msg = new AuthenticationMessage()
+			{
+				Registration = false,
+				Username = "Anonymous",
+				Password = "pass"
+			};
+
+			await utils.SendThroughSocketAsync(clientSocket, msg, cts.Token);
+			var result =
+				await utils.ReceiveFromSocketAsync<AuthenticationResultMessage>(clientSocket);
+
+			Assert.IsFalse(result.IsSuccess);
+			Assert.AreNotEqual("", result.ErrorMessage);
+
+			var status = WebSocketCloseStatus.NormalClosure;
+			await clientSocket.CloseAsync(status, "", cts.Token);
+		}
+		[Test]
+		public async Task TryingToRegisterAsAnonymousReturnsErrorMessage()
+		{
+			var cts = new CancellationTokenSource();
+
+			var clientSocket = new ClientWebSocket();
+
+			await clientSocket.ConnectAsync(utils.serverUrl, cts.Token);
+
+			var msg = new AuthenticationMessage()
+			{
+				Registration = true,
+				Username = "Anonymous",
+				Password = "pass1"
+			};
+
+			await utils.SendThroughSocketAsync(clientSocket, msg, cts.Token);
+			var result =
+				await utils.ReceiveFromSocketAsync<AuthenticationResultMessage>(clientSocket);
+
+			Assert.IsFalse(result.IsSuccess);
+			Assert.AreNotEqual("", result.ErrorMessage);
+
+			var status = WebSocketCloseStatus.NormalClosure;
+			await clientSocket.CloseAsync(status, "", cts.Token);
+		}
+		[Test]
 		public async Task RegisteringAccountIsSuccessful()
 		{
 			var cts = new CancellationTokenSource();
