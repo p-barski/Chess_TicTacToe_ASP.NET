@@ -128,6 +128,11 @@ namespace ServerTests
 			await utils.ReceiveFromSocketAsync<GameFoundMessage>(
 				clientSocket2);
 
+			await utils.ReceiveFromSocketAsync<dynamic>(
+				clientSocket1);
+			await utils.ReceiveFromSocketAsync<dynamic>(
+				clientSocket2);
+
 			var status = WebSocketCloseStatus.NormalClosure;
 			await clientSocket1.CloseAsync(status, "", cts.Token);
 			await utils.ReceiveFromSocketAsync<SessionClosedMessage>(

@@ -21,17 +21,23 @@ namespace Server.Database
 			context.Database.EnsureCreated();
 			PlayerDataForNotLoggedInPlayers = GetOrCreatePlayerDataForNotLoggedInPlayers(context);
 		}
-		public IEnumerable<ChessGameDb> GetAllSavedGames()
+		public async Task<ChessGameDb> GetSavedGame(PlayerData whitePlayer, PlayerData blackPlayer)
 		{
 			using var context = new GamesDbContext(connectionString, usePostgres);
-			var chessGames = context.ChessGames.ToList();
+			context.PlayerDatas.Attach(whitePlayer);
+			context.PlayerDatas.Attach(blackPlayer);
+
+			var chessGame = context.ChessGames
+				.FirstOrDefault(
+					g => g.Result == "" &&
+					g.WhitePlayer.Id == whitePlayer.Id &&
+					g.BlackPlayer.Id == blackPlayer.Id);
+
 			//Loading ChessMoves list, otherwise it will be null
-			chessGames
-				.ForEach(async g => await context
-					.Entry(g)
+			await context.Entry(chessGame)
 					.Collection(g => g.ChessMoves)
-					.LoadAsync());
-			return chessGames;
+					.LoadAsync();
+			return chessGame;
 		}
 		public async Task SaveGameAsync(ChessGameDb chessGame)
 		{
@@ -39,6 +45,15 @@ namespace Server.Database
 			context.PlayerDatas.Attach(chessGame.WhitePlayer);
 			context.PlayerDatas.Attach(chessGame.BlackPlayer);
 			await context.AddAsync(chessGame);
+			await context.SaveChangesAsync();
+		}
+		public async Task UpdateGameAsync(ChessGameDb chessGame)
+		{
+			using var context = new GamesDbContext(connectionString, usePostgres);
+			context.PlayerDatas.Attach(chessGame.WhitePlayer);
+			context.PlayerDatas.Attach(chessGame.BlackPlayer);
+			context.ChessMoves.AttachRange(chessGame.ChessMoves);
+			context.Update(chessGame);
 			await context.SaveChangesAsync();
 		}
 		public PlayerData GetPlayerData(string name)

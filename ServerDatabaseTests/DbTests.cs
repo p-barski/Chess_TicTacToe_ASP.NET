@@ -1,9 +1,8 @@
 using System;
-using System.Linq;
+using System.IO;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Security.Cryptography;
-using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using Server.Database;
 using Server.Database.Chess;
@@ -12,24 +11,51 @@ namespace ServerDatabaseTests
 {
 	public class DbTests
 	{
-		const string connectionString = "Data Source=tests.db;";
+		const string connectionString = "Data Source=tests.db";
+		[SetUp]
+		public void SetUp()
+		{
+			var sqliteFile = connectionString.Substring(12);
+			try
+			{
+				Console.WriteLine(Path.GetFullPath(sqliteFile));
+				File.Delete(sqliteFile);
+			}
+			catch (IOException) { }
+		}
 		[Test]
 		public async Task TestSavingChessGame()
 		{
-			var chessMoves = new List<ChessMoveDb>(){
-				new ChessMoveDb(0, 0, 1, 0, 3, ""),
-				new ChessMoveDb(1, 0, 6, 0, 4, ""),
-			};
 			var whitePlayer = new PlayerData("Test1", "k$|31FsvXh]./a;1@#$Fg@#$$%&5423dfhFDdfvb");
-			var blackPlayer = new PlayerData("Test2",
-				new string("k$|31FsvXh]./a;1@#$Fg@#$$%&5423dfhFDdfvb".Reverse().ToArray()));
+			var blackPlayer = new PlayerData("Test2", "345#^$254235#@%#gdFG%^&Tyjfgb%$^df%^&RGH");
 			var startDate = DateTime.Now;
 			var finishDate = startDate.AddDays(1);
-			var chessGame = new ChessGameDb(chessMoves, whitePlayer, blackPlayer,
-				startDate, finishDate, "Stalemate");
+			var chessGame = new ChessGameDb(whitePlayer, blackPlayer, startDate);
 
 			var databaseAccess = new DatabaseAccess(connectionString);
 			await databaseAccess.SaveGameAsync(chessGame);
+		}
+		[Test]
+		public async Task TestUpdatingChessGame()
+		{
+			var chessMoves = new List<ChessMoveDb>(){
+				new ChessMoveDb(0, 1, 0, 3, "", DateTime.UtcNow),
+				new ChessMoveDb(0, 6, 0, 4, "", DateTime.UtcNow),
+			};
+			var whitePlayer = new PlayerData("Test1", "O|POfB#$5GHfJ345rWSvbcB45345etHFGHerTw");
+			var blackPlayer = new PlayerData("Test2", "#$%dsgDhR^Y&DfG365Fgrt^4%^jTYIDdfShO67");
+			var startDate = DateTime.Now;
+			var finishDate = startDate.AddDays(1);
+			var chessGame = new ChessGameDb(whitePlayer, blackPlayer, startDate);
+
+			var databaseAccess = new DatabaseAccess(connectionString);
+			await databaseAccess.SaveGameAsync(chessGame);
+
+			chessGame.ChessMoves.AddRange(chessMoves);
+			chessGame.Result = "BlackWin";
+			chessGame.FinishDate = finishDate;
+
+			await databaseAccess.UpdateGameAsync(chessGame);
 		}
 		[Test]
 		public async Task TestSavingPlayerData()
@@ -47,13 +73,27 @@ namespace ServerDatabaseTests
 			await databaseAccess.SavePlayerDataAsync(playerData);
 		}
 		[Test]
-		public void TestReading()
+		public async Task TestReading()
 		{
+			var chessMoves = new List<ChessMoveDb>(){
+				new ChessMoveDb(0, 1, 0, 3, "", DateTime.UtcNow),
+				new ChessMoveDb(0, 6, 0, 4, "", DateTime.UtcNow),
+			};
+			var whitePlayer = new PlayerData("Test1", "O|POfB#$5GHfJ345rWSvbcB45345etHFGHerTw");
+			var blackPlayer = new PlayerData("Test2", "#$%dsgDhR^Y&DfG365Fgrt^4%^jTYIDdfShO67");
+			var startDate = DateTime.Now;
+			var finishDate = startDate.AddDays(1);
+			var chessGame = new ChessGameDb(whitePlayer, blackPlayer, startDate);
+
 			var databaseAccess = new DatabaseAccess(connectionString);
-			var games = databaseAccess.GetAllSavedGames();
-			games
-				.ToList()
-				.ForEach(g => Assert.IsTrue(g.ChessMoves != null));
+			await databaseAccess.SaveGameAsync(chessGame);
+
+			chessGame.ChessMoves.AddRange(chessMoves);
+			chessGame.FinishDate = finishDate;
+
+			await databaseAccess.UpdateGameAsync(chessGame);
+			var gameDb = await databaseAccess.GetSavedGame(whitePlayer, blackPlayer);
+			Assert.IsTrue(gameDb.ChessMoves != null);
 		}
 		[Test]
 		public void TestGettingPlayerDataForNotLoggedInPlayers()

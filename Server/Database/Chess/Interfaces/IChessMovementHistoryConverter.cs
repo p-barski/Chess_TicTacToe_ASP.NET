@@ -1,12 +1,9 @@
-using System;
 using Chess.Movement;
 
 namespace Server.Database.Chess
 {
-	public interface IChessMovementHistoryConverter
+	public interface IChessMoveConverter
 	{
-		ChessGameDb ConvertToDb(IReadOnlyMovementHistory movementHistory,
-			PlayerData whitePlayer, PlayerData blackPlayer, DateTime startDate,
-			DateTime finishDate, string result);
+		ChessMoveDb ConvertToDb(ChessMove move);
 	}
 }

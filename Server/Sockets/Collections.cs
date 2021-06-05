@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Server.Games;
 using Server.Sockets.Other;
 using Server.Sockets.Messages;
+using Server.Database;
 
 namespace Server.Sockets
 {
@@ -13,15 +14,17 @@ namespace Server.Sockets
 	{
 		private readonly ILogger<Collections> logger;
 		private readonly IMessageSender messageSender;
+		private readonly IChessSessionCanceler canceler;
 		private readonly ConcurrentDictionary<IPlayer, byte> players
 			= new ConcurrentDictionary<IPlayer, byte>();
 		private readonly ConcurrentDictionary<IGameSession, byte> sessions
 			= new ConcurrentDictionary<IGameSession, byte>();
 		public Collections(ILogger<Collections> logger,
-			IMessageSender messageSender)
+			IMessageSender messageSender, IChessSessionCanceler canceler)
 		{
 			this.logger = logger;
 			this.messageSender = messageSender;
+			this.canceler = canceler;
 		}
 		public void AddPlayer(IPlayer player)
 		{
@@ -34,6 +37,7 @@ namespace Server.Sockets
 			if (player.GameSessionGUID == Guid.Empty)
 				return;
 			var session = FindSessionOfAPlayer(player);
+			await canceler.TryCancel(session, player);
 			var message = new SessionClosedMessage("Other player closed the game.");
 			if (session.PlayerTwo == player)
 				await messageSender.SendMessageAsync(session.PlayerOne.Socket, message);

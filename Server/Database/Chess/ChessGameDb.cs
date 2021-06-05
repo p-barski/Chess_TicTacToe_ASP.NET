@@ -10,19 +10,18 @@ namespace Server.Database.Chess
 		public PlayerData WhitePlayer { get; private set; }
 		public PlayerData BlackPlayer { get; private set; }
 		public DateTime StartDate { get; private set; }
-		public DateTime FinishDate { get; private set; }
-		public string Result { get; private set; }
+		public DateTime FinishDate { get; set; }
+		public string Result { get; set; }
 		public ChessGameDb() { }
-		public ChessGameDb(List<ChessMoveDb> chessMoves, PlayerData whitePlayer,
-			PlayerData blackPlayer, DateTime startDate, DateTime finishDate,
-			string result)
+		public ChessGameDb(PlayerData whitePlayer,
+			PlayerData blackPlayer, DateTime startDate)
 		{
-			ChessMoves = chessMoves;
+			ChessMoves = new();
 			WhitePlayer = whitePlayer;
 			BlackPlayer = blackPlayer;
 			StartDate = startDate;
-			FinishDate = finishDate;
-			Result = result;
+			FinishDate = DateTime.MinValue;
+			Result = "";
 		}
 	}
 }

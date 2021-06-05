@@ -8,6 +8,7 @@ using Server.Sockets.Other;
 using Server.Sockets.Messages;
 using Server.Games;
 using Server.Games.TicTacToe;
+using Server.Database;
 
 namespace ServerTests
 {
@@ -23,6 +24,7 @@ namespace ServerTests
 		{
 			msgSenderMock.Setup(m => m.SendMessageAsync(It.IsAny<IWebSocket>(),
 				It.IsAny<SessionClosedMessage>())).Returns(() => Task.Delay(0));
+			var cancelerMock = new Mock<IChessSessionCanceler>();
 
 			var player1Mock = new Mock<IPlayer>(MockBehavior.Strict);
 			var player2Mock = new Mock<IPlayer>(MockBehavior.Strict);
@@ -49,7 +51,8 @@ namespace ServerTests
 			gameSessionMock.SetupGet(s => s.PlayerTwo).Returns(player2Mock.Object);
 			gameSessionMock.Setup(s => s.Close());
 
-			var collections = new Collections(loggerMock.Object, msgSenderMock.Object);
+			var collections = new Collections(loggerMock.Object, msgSenderMock.Object,
+				cancelerMock.Object);
 
 			collections.AddPlayer(player1Mock.Object);
 			collections.AddPlayer(player2Mock.Object);
@@ -65,6 +68,7 @@ namespace ServerTests
 		{
 			var player1Mock = new Mock<IPlayer>(MockBehavior.Strict);
 			var player2Mock = new Mock<IPlayer>(MockBehavior.Strict);
+			var cancelerMock = new Mock<IChessSessionCanceler>();
 
 			var player1Guid = Guid.NewGuid();
 			var player2Guid = Guid.NewGuid();
@@ -77,7 +81,8 @@ namespace ServerTests
 			player2Mock.SetupGet(p => p.State).Returns(PlayerState.SearchingForGame);
 			player2Mock.SetupGet(p => p.ExpectedGame).Returns(new ExpectedTicTacToe(5));
 
-			var collections = new Collections(loggerMock.Object, msgSenderMock.Object);
+			var collections = new Collections(loggerMock.Object, msgSenderMock.Object,
+				cancelerMock.Object);
 
 			collections.AddPlayer(player1Mock.Object);
 			collections.AddPlayer(player2Mock.Object);
@@ -93,6 +98,7 @@ namespace ServerTests
 			var player2Mock = new Mock<IPlayer>(MockBehavior.Strict);
 			var player3Mock = new Mock<IPlayer>(MockBehavior.Strict);
 			var player4Mock = new Mock<IPlayer>(MockBehavior.Strict);
+			var cancelerMock = new Mock<IChessSessionCanceler>();
 
 			var player1Guid = Guid.NewGuid();
 			var player2Guid = Guid.NewGuid();
@@ -115,7 +121,8 @@ namespace ServerTests
 			player4Mock.SetupGet(p => p.State).Returns(PlayerState.Idle);
 			player4Mock.SetupGet(p => p.ExpectedGame).Returns(new ExpectedTicTacToe(5));
 
-			var collections = new Collections(loggerMock.Object, msgSenderMock.Object);
+			var collections = new Collections(loggerMock.Object, msgSenderMock.Object,
+				cancelerMock.Object);
 
 			collections.AddPlayer(player1Mock.Object);
 			collections.AddPlayer(player2Mock.Object);

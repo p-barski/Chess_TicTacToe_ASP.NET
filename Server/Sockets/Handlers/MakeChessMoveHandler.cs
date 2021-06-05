@@ -1,12 +1,13 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using Server.Games;
 using Server.Games.Chess;
 using Server.Sockets.Other;
 using Server.Sockets.Messages;
 using Server.Database;
 using Server.Database.Chess;
+using Chess.Movement;
 
 namespace Server.Sockets.Handlers
 {
@@ -14,10 +15,10 @@ namespace Server.Sockets.Handlers
 	{
 		private readonly ICollections collections;
 		private readonly IMessageSender messageSender;
-		private readonly IChessMovementHistoryConverter converter;
+		private readonly IChessMoveConverter converter;
 		private readonly IChessDatabase databaseAccess;
 		public MakeChessMoveHandler(ICollections collections, IMessageSender messageSender,
-			IChessMovementHistoryConverter converter, IChessDatabase databaseAccess)
+			IChessMoveConverter converter, IChessDatabase databaseAccess)
 		{
 			this.collections = collections;
 			this.messageSender = messageSender;
@@ -58,17 +59,21 @@ namespace Server.Sockets.Handlers
 			{
 				case PlayResult.Success:
 				case PlayResult.Check:
+					await SaveChessMoveToDatabase(session);
 					await SendToBothAsync(session, player, result);
 					break;
 				case PlayResult.Draw:
+					await SaveChessMoveToDatabase(session);
 					await SendStalemateAsync(session);
 					collections.RemoveSession(session);
 					break;
 				case PlayResult.YouWin:
+					await SaveChessMoveToDatabase(session);
 					await SendGameFinishedAsync(session, player);
 					collections.RemoveSession(session);
 					break;
 				case PlayResult.PromotionRequired:
+					await SaveChessMoveToDatabase(session);
 					await SendPromotionAsync(player);
 					break;
 				default:
@@ -116,10 +121,10 @@ namespace Server.Sockets.Handlers
 
 			if (IsWhitePlayer(session, winner))
 			{
-				await SaveGameHistory(session, "WhiteWin");
+				await FinalizeChessGameSession(session, "WhiteWin");
 				return;
 			}
-			await SaveGameHistory(session, "BlackWin");
+			await FinalizeChessGameSession(session, "BlackWin");
 		}
 		private async Task SendStalemateAsync(ChessGameSession session)
 		{
@@ -127,7 +132,7 @@ namespace Server.Sockets.Handlers
 			{
 				Message = PlayResult.Draw.ToString()
 			};
-			await SaveGameHistory(session, "Stalemate");
+			await FinalizeChessGameSession(session, "Stalemate");
 
 			await messageSender.SendMessageAsync(session.PlayerOne.Socket, stalemateMsg);
 			await messageSender.SendMessageAsync(session.PlayerTwo.Socket, stalemateMsg);
@@ -167,12 +172,28 @@ namespace Server.Sockets.Handlers
 		{
 			return session.PlayerOne == player;
 		}
-		private async Task SaveGameHistory(ChessGameSession session, string result)
+		private async Task SaveChessMoveToDatabase(ChessGameSession session)
 		{
-			var gameDb = converter.ConvertToDb(session.MovementHistory,
-				session.PlayerOne.PlayerData, session.PlayerTwo.PlayerData,
-				session.StartDate, DateTime.UtcNow, result);
-			await databaseAccess.SaveGameAsync(gameDb);
+			var gameDb = await databaseAccess.GetSavedGame(session.PlayerOne.PlayerData,
+				session.PlayerTwo.PlayerData);
+			if (gameDb == null)
+			{
+				return;
+			}
+			gameDb.ChessMoves.Add(converter.ConvertToDb(session.MovementHistory.ChessMoves[^1]));
+			await databaseAccess.UpdateGameAsync(gameDb);
+		}
+		private async Task FinalizeChessGameSession(ChessGameSession session, string result)
+		{
+			var gameDb = await databaseAccess.GetSavedGame(session.PlayerOne.PlayerData,
+				session.PlayerTwo.PlayerData);
+			if (gameDb == null)
+			{
+				return;
+			}
+			gameDb.Result = result;
+			gameDb.FinishDate = DateTime.UtcNow;
+			await databaseAccess.UpdateGameAsync(gameDb);
 		}
 	}
 }

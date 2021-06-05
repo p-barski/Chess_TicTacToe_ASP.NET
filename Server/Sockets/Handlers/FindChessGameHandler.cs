@@ -5,6 +5,8 @@ using Server.Games;
 using Server.Games.Chess;
 using Server.Sockets.Other;
 using Server.Sockets.Messages;
+using Server.Database;
+using Server.Database.Chess;
 
 namespace Server.Sockets.Handlers
 {
@@ -14,15 +16,16 @@ namespace Server.Sockets.Handlers
 		private readonly ICollections collections;
 		private readonly IGameSessionFactory sessionFactory;
 		private readonly IMessageSender messageSender;
-
+		private readonly IChessDatabase databaseAccess;
 		public FindChessGameHandler(ILogger<FindChessGameHandler> logger,
 			ICollections collections, IGameSessionFactory sessionFactory,
-			IMessageSender messageSender)
+			IMessageSender messageSender, IChessDatabase databaseAccess)
 		{
 			this.logger = logger;
 			this.collections = collections;
 			this.sessionFactory = sessionFactory;
 			this.messageSender = messageSender;
+			this.databaseAccess = databaseAccess;
 		}
 		public async Task HandleMessageAsync(IPlayer player, IReceivedMessage message)
 		{
@@ -42,6 +45,10 @@ namespace Server.Sockets.Handlers
 				ChessGameSession session = (ChessGameSession)sessionFactory
 					.Create(player, opponent, expectedGame);
 				collections.AddSession(session);
+
+				var gameDb = new ChessGameDb(session.PlayerOne.PlayerData,
+					session.PlayerTwo.PlayerData, DateTime.UtcNow);
+				await databaseAccess.SaveGameAsync(gameDb);
 				logger.LogInformation("Created new chess game session.");
 
 				await messageSender.SendMessageAsync(player.Socket, new GameFoundMessage(true));

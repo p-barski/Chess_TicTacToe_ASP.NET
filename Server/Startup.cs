@@ -28,9 +28,10 @@ namespace Server
 
 			services.AddSingleton<IChessDatabase>(databaseAccess);
 			services.AddSingleton<IPlayerDataDatabase>(databaseAccess);
-			services.AddSingleton<IChessMovementHistoryConverter, ChessMovementHistoryConverter>();
+			services.AddSingleton<IChessMoveConverter, ChessMoveConverter>();
 			services.AddSingleton<IChessGameFactory, ChessGameFactory>();
 			services.AddSingleton<IGameSessionFactory, GameSessionFactory>();
+			services.AddSingleton<IChessSessionCanceler, ChessSessionCanceler>();
 			services.AddSingleton<ICollections, Collections>();
 			services.AddSingleton<IMessageDeserializer, MessageDeserializer>();
 			services.AddSingleton<IMessageSender, MessageSender>();
